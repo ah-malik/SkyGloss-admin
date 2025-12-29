@@ -17,7 +17,9 @@ const Products = () => {
         features: [''],
         specifications: [{ label: '', value: '' }],
         sizes: [{ size: '', price: '' }],
-        status: 'published'
+        sizes: [{ size: '', price: '' }],
+        status: 'published',
+        targetAudience: 'all'
     });
 
     useEffect(() => {
@@ -47,7 +49,9 @@ const Products = () => {
                 features: product.features || [''],
                 specifications: product.specifications || [{ label: '', value: '' }],
                 sizes: product.sizes || [{ size: '', price: '' }],
-                status: product.status
+                sizes: product.sizes || [{ size: '', price: '' }],
+                status: product.status,
+                targetAudience: product.targetAudience || 'all'
             });
         } else {
             setEditingProduct(null);
@@ -60,7 +64,9 @@ const Products = () => {
                 features: [''],
                 specifications: [{ label: '', value: '' }],
                 sizes: [{ size: '', price: '' }],
-                status: 'published'
+                sizes: [{ size: '', price: '' }],
+                status: 'published',
+                targetAudience: 'all'
             });
         }
         setIsModalOpen(true);
@@ -350,6 +356,19 @@ const Products = () => {
                                     >
                                         <option value="published">Published</option>
                                         <option value="draft">Draft</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-sm font-semibold text-slate-700">Target Audience</label>
+                                    <select
+                                        name="targetAudience"
+                                        value={formData.targetAudience}
+                                        onChange={handleInputChange}
+                                        className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 appearance-none bg-white"
+                                    >
+                                        <option value="all">All Users</option>
+                                        <option value="shop">Shop Only</option>
+                                        <option value="technician">Technician Only</option>
                                     </select>
                                 </div>
                             </div>

@@ -96,8 +96,9 @@ const Users = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                                                user.role === 'distributor' ? 'bg-blue-100 text-blue-700' :
-                                                    user.role === 'shop' ? 'bg-emerald-100 text-emerald-700' :
+                                            user.role === 'distributor' ? 'bg-blue-100 text-blue-700' :
+                                                user.role === 'shop' ? 'bg-emerald-100 text-emerald-700' :
+                                                    user.role === 'technician' ? 'bg-cyan-100 text-cyan-700' :
                                                         'bg-orange-100 text-orange-700'
                                             }`}>
                                             {user.role}
@@ -106,12 +107,12 @@ const Users = () => {
                                     <td className="px-6 py-4 text-slate-600 font-medium">{user.country || '-'}</td>
                                     <td className="px-6 py-4">
                                         <span className={`flex items-center gap-1.5 text-sm font-medium ${user.status === 'active' ? 'text-emerald-600' :
-                                                user.status === 'pending' ? 'text-orange-500' :
-                                                    'text-red-500'
+                                            user.status === 'pending' ? 'text-orange-500' :
+                                                'text-red-500'
                                             }`}>
                                             <span className={`w-2 h-2 rounded-full ${user.status === 'active' ? 'bg-emerald-500' :
-                                                    user.status === 'pending' ? 'bg-orange-500' :
-                                                        'bg-red-500'
+                                                user.status === 'pending' ? 'bg-orange-500' :
+                                                    'bg-red-500'
                                                 }`} />
                                             {user.status}
                                         </span>

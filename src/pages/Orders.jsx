@@ -109,6 +109,7 @@ const Orders = () => {
                         <thead className="bg-gray-50/50 border-b border-gray-100">
                             <tr>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Order Info</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Source</th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
@@ -150,6 +151,16 @@ const Orders = () => {
                                                     </p>
                                                 </div>
                                             </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium uppercase ${order.user?.role === 'technician'
+                                                    ? 'bg-cyan-100 text-cyan-800'
+                                                    : order.user?.role === 'shop'
+                                                        ? 'bg-emerald-100 text-emerald-800'
+                                                        : 'bg-gray-100 text-gray-800'
+                                                }`}>
+                                                {order.user?.role || 'Unknown'}
+                                            </span>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">

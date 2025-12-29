@@ -15,6 +15,7 @@ import ResetPassword from './pages/ResetPassword';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
 import OrderDetails from './pages/OrderDetails';
+import SupportTickets from './pages/SupportTickets';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             <Route element={<Layout children={<CertificationRequests />} />} path="/certification-requests" />
             <Route element={<Layout children={<Orders />} />} path="/orders" />
             <Route element={<Layout children={<OrderDetails />} />} path="/orders/:id" />
+            <Route element={<Layout children={<SupportTickets />} />} path="/support-tickets" />
           </Route>
 
           <Route path="/unauthorized" element={<div className="min-h-screen flex items-center justify-center">Unauthorized Access</div>} />
