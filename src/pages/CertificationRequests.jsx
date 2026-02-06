@@ -128,6 +128,11 @@ const CertificationRequests = () => {
                                                 <Clock size={16} />
                                                 {new Date(request.createdAt).toLocaleDateString()}
                                             </div>
+                                            {request.certificateNumber && (
+                                                <div className="flex items-center gap-2 text-sm font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                                                    ID: {request.certificateNumber}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
