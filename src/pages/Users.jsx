@@ -22,12 +22,35 @@ const Users = () => {
         }
     };
 
-    const handleStatusChange = async (userId, newStatus) => {
+    const handleStatusChange = async (userId, userRole, newStatus) => {
+        if (userRole === 'admin') {
+            alert('Administrator status cannot be changed');
+            return;
+        }
         try {
             await api.patch(`/users/${userId}`, { status: newStatus });
             fetchUsers(); // Refresh
         } catch (err) {
             alert('Failed to update status');
+        }
+    };
+
+    const handleDelete = async (userId, userRole) => {
+        if (userRole === 'admin') {
+            alert('Administrator accounts cannot be deleted');
+            return;
+        }
+
+        if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            await api.delete(`/users/${userId}`);
+            fetchUsers();
+            alert('User deleted successfully');
+        } catch (err) {
+            alert('Failed to delete user');
         }
     };
 
@@ -119,19 +142,37 @@ const Users = () => {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2">
-                                            {user.status !== 'active' && (
-                                                <button onClick={() => handleStatusChange(user._id, 'active')} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="Activate">
-                                                    <CheckCircle size={18} />
-                                                </button>
+                                            {user.role !== 'admin' ? (
+                                                <>
+                                                    {user.status !== 'active' && (
+                                                        <button
+                                                            onClick={() => handleStatusChange(user._id, user.role, 'active')}
+                                                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg"
+                                                            title="Activate"
+                                                        >
+                                                            <CheckCircle size={18} />
+                                                        </button>
+                                                    )}
+                                                    {user.status !== 'blocked' && (
+                                                        <button
+                                                            onClick={() => handleStatusChange(user._id, user.role, 'blocked')}
+                                                            className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg"
+                                                            title="Block"
+                                                        >
+                                                            <Ban size={18} />
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleDelete(user._id, user.role)}
+                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <span className="text-xs text-slate-400 font-medium px-2 py-1">Protected</span>
                                             )}
-                                            {user.status !== 'blocked' && (
-                                                <button onClick={() => handleStatusChange(user._id, 'blocked')} className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg" title="Block">
-                                                    <Ban size={18} />
-                                                </button>
-                                            )}
-                                            <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
-                                                <Trash2 size={18} />
-                                            </button>
                                         </div>
                                     </td>
                                 </tr>
