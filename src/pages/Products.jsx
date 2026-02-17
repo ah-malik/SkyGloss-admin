@@ -42,9 +42,11 @@ const Products = () => {
     const fetchProducts = async () => {
         try {
             const res = await api.get('/products');
-            setProducts(res.data);
+            // Support both wrapped and direct array responses
+            const productsData = Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []);
+            setProducts(productsData);
         } catch (err) {
-            console.error(err);
+            console.error('[Products] Fetch error:', err);
         } finally {
             setLoading(false);
         }

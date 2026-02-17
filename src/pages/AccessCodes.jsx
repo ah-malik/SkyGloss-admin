@@ -26,14 +26,26 @@ const AccessCodes = () => {
         setLoading(true);
         try {
             const res = await api.get(`/access-codes?page=${pagination.page}&limit=${pagination.limit}`);
-            setCodes(res.data.data);
-            setPagination(prev => ({
-                ...prev,
-                total: res.data.total,
-                totalPages: res.data.totalPages
-            }));
+
+            // Robust data handling
+            let codesData = [];
+            if (res.data && Array.isArray(res.data.data)) {
+                codesData = res.data.data;
+            } else if (Array.isArray(res.data)) {
+                codesData = res.data;
+            }
+            setCodes(codesData);
+
+            // Robust pagination handling
+            if (res.data && typeof res.data.total === 'number') {
+                setPagination(prev => ({
+                    ...prev,
+                    total: res.data.total,
+                    totalPages: res.data.totalPages || Math.ceil(res.data.total / prev.limit) || 0
+                }));
+            }
         } catch (err) {
-            console.error(err);
+            console.error('[AccessCodes] Fetch error:', err);
         } finally {
             setLoading(false);
         }
@@ -93,7 +105,7 @@ const AccessCodes = () => {
                         <tbody className="divide-y divide-slate-100">
                             {loading ? (
                                 <tr><td colSpan="5" className="p-10 text-center text-slate-400">Loading codes...</td></tr>
-                            ) : codes.length === 0 ? (
+                            ) : (!Array.isArray(codes) || codes.length === 0) ? (
                                 <tr><td colSpan="5" className="p-10 text-center text-slate-400">No access codes found</td></tr>
                             ) : codes.map((item) => (
                                 <tr key={item._id} className="hover:bg-slate-50/50 transition-colors">
@@ -160,7 +172,7 @@ const AccessCodes = () => {
                             Previous
                         </button>
                         <div className="flex items-center gap-1">
-                            {[...Array(Math.min(5, pagination.totalPages))].map((_, i) => {
+                            {[...Array(Math.max(0, Math.min(5, Number(pagination.totalPages) || 0)))].map((_, i) => {
                                 let pageNum;
                                 if (pagination.totalPages <= 5) {
                                     pageNum = i + 1;
