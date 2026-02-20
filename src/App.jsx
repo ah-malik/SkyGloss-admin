@@ -18,6 +18,7 @@ import Orders from './pages/Orders';
 import OrderDetails from './pages/OrderDetails';
 import SupportTickets from './pages/SupportTickets';
 import LiveChat from './pages/LiveChat';
+import ProductGroups from './pages/ProductGroups';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
             <Route element={<Layout children={<OrderDetails />} />} path="/orders/:id" />
             <Route element={<Layout children={<SupportTickets />} />} path="/support-tickets" />
             <Route element={<Layout children={<LiveChat />} />} path="/live-chat" />
+            <Route element={<Layout children={<ProductGroups />} />} path="/product-groups" />
           </Route>
 
           <Route path="/unauthorized" element={<div className="min-h-screen flex items-center justify-center">Unauthorized Access</div>} />

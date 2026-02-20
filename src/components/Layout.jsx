@@ -24,6 +24,7 @@ const Layout = ({ children }) => {
         { name: 'Dashboard', icon: BarChart3, path: '/' },
         { name: 'User Management', icon: Users, path: '/users' },
         { name: 'Product Management', icon: Package, path: '/products', roles: ['admin'] },
+        { name: 'Pricing Groups', icon: ShieldCheck, path: '/product-groups', roles: ['admin'] },
         { name: 'Shop Requests', icon: Store, path: '/shop-requests', roles: ['admin'] },
         { name: 'Certification Requests', icon: ShieldCheck, path: '/certification-requests', roles: ['admin'] },
         { name: 'Order Management', icon: Package, path: '/orders', roles: ['admin'] },
