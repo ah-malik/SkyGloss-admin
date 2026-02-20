@@ -10,7 +10,20 @@ const ProductGroups = () => {
     const [editingGroup, setEditingGroup] = useState(null);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [groupName, setGroupName] = useState('');
+    const [currency, setCurrency] = useState('USD');
     const [searchProduct, setSearchProduct] = useState('');
+
+    const currencies = [
+        { code: 'USD', symbol: '$' },
+        { code: 'EUR', symbol: '€' },
+        { code: 'GBP', symbol: '£' },
+        { code: 'CAD', symbol: 'CA$' },
+        { code: 'AUD', symbol: 'A$' },
+        { code: 'AED', symbol: 'AED' },
+        { code: 'PKR', symbol: 'Rs.' }
+    ];
+
+    const getSymbol = (code) => currencies.find(c => c.code === code)?.symbol || '$';
 
     useEffect(() => {
         fetchGroups();
@@ -42,6 +55,7 @@ const ProductGroups = () => {
         if (group) {
             setEditingGroup(group);
             setGroupName(group.name);
+            setCurrency(group.currency || 'USD');
             setSelectedProducts(group.products.map(p => ({
                 productId: p.productId._id || p.productId,
                 name: p.productId.name,
@@ -50,6 +64,7 @@ const ProductGroups = () => {
         } else {
             setEditingGroup(null);
             setGroupName('');
+            setCurrency('USD');
             setSelectedProducts([]);
         }
         setIsModalOpen(true);
@@ -86,6 +101,7 @@ const ProductGroups = () => {
 
         const payload = {
             name: groupName,
+            currency: currency,
             products: selectedProducts.map(p => ({
                 productId: p.productId,
                 sizes: p.sizes
@@ -165,7 +181,7 @@ const ProductGroups = () => {
                                             {p.sizes.map((s, sIdx) => (
                                                 <div key={sIdx} className="flex justify-between text-xs">
                                                     <span className="text-slate-500">{s.size}</span>
-                                                    <span className="font-bold text-blue-600">${s.price}</span>
+                                                    <span className="font-bold text-blue-600">{getSymbol(group.currency)}{s.price}</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -188,15 +204,29 @@ const ProductGroups = () => {
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-slate-700">Group Name</label>
-                                <input
-                                    type="text"
-                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
-                                    placeholder="e.g. Premium Shops"
-                                    value={groupName}
-                                    onChange={(e) => setGroupName(e.target.value)}
-                                />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-700">Group Name</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                        placeholder="e.g. Premium Shops"
+                                        value={groupName}
+                                        onChange={(e) => setGroupName(e.target.value)}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-700">Currency</label>
+                                    <select
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all outline-none appearance-none"
+                                        value={currency}
+                                        onChange={(e) => setCurrency(e.target.value)}
+                                    >
+                                        {currencies.map(c => (
+                                            <option key={c.code} value={c.code}>{c.code} ({c.symbol})</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -263,10 +293,10 @@ const ProductGroups = () => {
                                                         <div key={sIdx} className="flex items-center gap-3">
                                                             <span className="text-xs text-slate-500 w-20 truncate">{s.size}</span>
                                                             <div className="relative flex-1">
-                                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">$</span>
+                                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">{getSymbol(currency)}</span>
                                                                 <input
                                                                     type="number"
-                                                                    className="w-full pl-6 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-blue-600 outline-none focus:border-blue-300"
+                                                                    className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-blue-600 outline-none focus:border-blue-300"
                                                                     value={s.price}
                                                                     onChange={(e) => handlePriceChange(product.productId, sIdx, e.target.value)}
                                                                 />
