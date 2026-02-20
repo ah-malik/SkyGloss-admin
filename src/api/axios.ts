@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://skygloss-backend-production.up.railway.app',
+    baseURL: import.meta.env.VITE_API_URL || 'https://skygloss-backend-production-3b96.up.railway.app',
 });
 
 const url = api.defaults.baseURL || '';

@@ -1,11 +1,24 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Search, Filter, MoreVertical, Trash2, Ban, CheckCircle } from 'lucide-react';
+import { Search, Filter, MoreVertical, Trash2, Ban, CheckCircle, X, Loader2 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('');
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [formData, setFormData] = useState({
+        email: '',
+        firstName: '',
+        lastName: '',
+        role: 'technician',
+        password: '',
+        phoneNumber: '',
+        companyName: '',
+        country: ''
+    });
 
     useEffect(() => {
         fetchUsers();
@@ -37,7 +50,7 @@ const Users = () => {
 
     const handleDelete = async (userId, userRole) => {
         if (userRole === 'admin') {
-            alert('Administrator accounts cannot be deleted');
+            toast.error('Administrator accounts cannot be deleted');
             return;
         }
 
@@ -48,9 +61,34 @@ const Users = () => {
         try {
             await api.delete(`/users/${userId}`);
             fetchUsers();
-            alert('User deleted successfully');
+            toast.success('User deleted successfully');
         } catch (err) {
-            alert('Failed to delete user');
+            toast.error('Failed to delete user');
+        }
+    };
+
+    const handleAddUser = async (e) => {
+        e.preventDefault();
+        setSubmitting(true);
+        try {
+            await api.post('/users', formData);
+            toast.success('User created successfully');
+            setIsAddModalOpen(false);
+            setFormData({
+                email: '',
+                firstName: '',
+                lastName: '',
+                role: 'technician',
+                password: '',
+                phoneNumber: '',
+                companyName: '',
+                country: ''
+            });
+            fetchUsers();
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to create user');
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -67,7 +105,10 @@ const Users = () => {
                     <h1 className="text-2xl font-bold">User Management</h1>
                     <p className="text-slate-500">Manage all registered users and their permissions</p>
                 </div>
-                <button className="bg-blue-600 text-white px-6 py-2 rounded-xl font-medium shadow-lg shadow-blue-600/20 hover:bg-blue-500 transition-all">
+                <button
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-xl font-medium shadow-lg shadow-blue-600/20 hover:bg-blue-500 transition-all"
+                >
                     Add New User
                 </button>
             </div>
@@ -181,6 +222,143 @@ const Users = () => {
                     </table>
                 </div>
             </div>
+
+            {/* Add User Modal */}
+            {isAddModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <div>
+                                <h2 className="text-xl font-bold">Add New User</h2>
+                                <p className="text-sm text-slate-500">Create a new user account for the platform</p>
+                            </div>
+                            <button
+                                onClick={() => setIsAddModalOpen(false)}
+                                className="p-2 hover:bg-slate-200 rounded-full transition-colors"
+                            >
+                                <X className="w-6 h-6 text-slate-500" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleAddUser} className="p-6 space-y-6">
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">First Name</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="John"
+                                        value={formData.firstName}
+                                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">Last Name</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="Doe"
+                                        value={formData.lastName}
+                                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">Email Address</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="john@example.com"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">Password</label>
+                                    <input
+                                        type="password"
+                                        required
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="••••••••"
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">Role</label>
+                                    <select
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 appearance-none"
+                                        value={formData.role}
+                                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                    >
+                                        <option value="technician">Technician</option>
+                                        <option value="shop">Shop</option>
+                                        <option value="distributor">Distributor</option>
+                                        <option value="admin">Administrator</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">Phone Number</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="+1 (234) 567-890"
+                                        value={formData.phoneNumber}
+                                        onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">Company Name</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="Acme Corp"
+                                        value={formData.companyName}
+                                        onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">Country</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="USA"
+                                        value={formData.country}
+                                        onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddModalOpen(false)}
+                                    className="flex-1 px-6 py-3 border border-slate-200 text-slate-600 font-semibold rounded-xl hover:bg-slate-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={submitting}
+                                    className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-500 disabled:opacity-50 shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
+                                >
+                                    {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create User'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -17,7 +17,7 @@ const LiveChat = () => {
     useEffect(() => {
         fetchRooms();
 
-        const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://skygloss-backend-production.up.railway.app';
+        const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://skygloss-backend-production-3b96.up.railway.app';
         const socket = io(socketUrl);
         socketRef.current = socket;
 
