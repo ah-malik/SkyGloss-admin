@@ -35,7 +35,6 @@ const Dashboard = () => {
         { label: 'Total Users', value: stats?.total || 0, icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
         { label: 'Distributors', value: stats?.distributor || 0, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-100' },
         { label: 'Shops', value: stats?.shop || 0, icon: Store, color: 'text-emerald-600', bg: 'bg-emerald-100' },
-        { label: 'Technicians', value: stats?.technician || 0, icon: Key, color: 'text-orange-600', bg: 'bg-orange-100' },
         { label: 'Total Revenue', value: `$${orderStats?.totalRevenue?.toFixed(2) || '0.00'}`, icon: DollarSign, color: 'text-green-600', bg: 'bg-green-100' },
     ];
 
@@ -47,7 +46,7 @@ const Dashboard = () => {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {cards.map((card) => (
                     <div key={card.label} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                         <div className="flex items-center gap-4">

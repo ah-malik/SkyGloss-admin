@@ -14,7 +14,7 @@ const AccessCodes = () => {
         totalPages: 0
     });
     const [newCodeData, setNewCodeData] = useState({
-        targetRole: 'technician',
+        targetRole: 'shop',
         expiresInDays: 7
     });
 
@@ -79,7 +79,7 @@ const AccessCodes = () => {
             <div className="flex justify-between items-end">
                 <div>
                     <h1 className="text-2xl font-bold">Access Codes</h1>
-                    <p className="text-slate-500">Generate and manage access codes for Technicians and Shops</p>
+                    <p className="text-slate-500">Generate and manage access codes for Shops</p>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
@@ -123,7 +123,7 @@ const AccessCodes = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${item.targetRole === 'technician' ? 'bg-orange-100 text-orange-700' : 'bg-emerald-100 text-emerald-700'
+                                        <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${item.targetRole === 'shop' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'
                                             }`}>
                                             {item.targetRole}
                                         </span>
@@ -222,7 +222,6 @@ const AccessCodes = () => {
                                     value={newCodeData.targetRole}
                                     onChange={(e) => setNewCodeData({ ...newCodeData, targetRole: e.target.value })}
                                 >
-                                    <option value="technician">Technician</option>
                                     <option value="shop">Shop (Non-USA)</option>
                                 </select>
                             </div>
