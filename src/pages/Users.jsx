@@ -105,7 +105,7 @@ const Users = () => {
             email: '',
             firstName: '',
             lastName: '',
-            role: 'technician',
+            role: 'distributor',
             password: '',
             phoneNumber: '',
             companyName: '',

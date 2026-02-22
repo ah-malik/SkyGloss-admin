@@ -153,13 +153,11 @@ const Orders = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium uppercase ${order.user?.role === 'technician'
-                                                ? 'bg-cyan-100 text-cyan-800'
-                                                : order.user?.role === 'shop'
-                                                    ? 'bg-emerald-100 text-emerald-800'
-                                                    : order.user?.role === 'distributor'
-                                                        ? 'bg-indigo-100 text-indigo-800'
-                                                        : 'bg-gray-100 text-gray-800'
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium uppercase ${order.user?.role === 'shop'
+                                                ? 'bg-emerald-100 text-emerald-800'
+                                                : order.user?.role === 'distributor'
+                                                    ? 'bg-indigo-100 text-indigo-800'
+                                                    : 'bg-gray-100 text-gray-800'
                                                 }`}>
                                                 {order.user?.role || 'Unknown'}
                                             </span>
