@@ -21,7 +21,9 @@ const Users = () => {
         phoneNumber: '',
         companyName: '',
         country: '',
-        productGroup: ''
+        productGroup: '',
+        address: '',
+        city: ''
     });
 
     useEffect(() => {
@@ -93,7 +95,9 @@ const Users = () => {
             phoneNumber: user.phoneNumber || '',
             companyName: user.companyName || '',
             country: user.country || '',
-            productGroup: user.productGroup?._id || user.productGroup || ''
+            productGroup: user.productGroup?._id || user.productGroup || '',
+            address: user.address || '',
+            city: user.city || ''
         });
         setIsAddModalOpen(true);
     };
@@ -110,7 +114,9 @@ const Users = () => {
             phoneNumber: '',
             companyName: '',
             country: '',
-            productGroup: ''
+            productGroup: '',
+            address: '',
+            city: ''
         });
         setIsAddModalOpen(true);
     };
@@ -186,6 +192,7 @@ const Users = () => {
                                 <th className="px-6 py-4 font-semibold">User</th>
                                 <th className="px-6 py-4 font-semibold">Role</th>
                                 <th className="px-6 py-4 font-semibold">Pricing Group</th>
+                                <th className="px-6 py-4 font-semibold">City</th>
                                 <th className="px-6 py-4 font-semibold">Country</th>
                                 <th className="px-6 py-4 font-semibold">Status</th>
                                 <th className="px-6 py-4 font-semibold text-right">Actions</th>
@@ -233,6 +240,7 @@ const Users = () => {
                                             <span className="text-sm text-slate-300 italic">No Group</span>
                                         )}
                                     </td>
+                                    <td className="px-6 py-4 text-slate-600 font-medium">{user.city || '-'}</td>
                                     <td className="px-6 py-4 text-slate-600 font-medium">{user.country || '-'}</td>
                                     <td className="px-6 py-4">
                                         <span className={`flex items-center gap-1.5 text-sm font-medium ${user.status === 'active' ? 'text-emerald-600' :
@@ -413,6 +421,29 @@ const Users = () => {
                                             </option>
                                         ))}
                                     </select>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">City</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="Enter city"
+                                        value={formData.city}
+                                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">Address</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="Enter full address"
+                                        value={formData.address}
+                                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                    />
                                 </div>
                             </div>
 
