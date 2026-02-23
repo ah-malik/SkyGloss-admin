@@ -192,6 +192,7 @@ const Users = () => {
                                 <th className="px-6 py-4 font-semibold">User</th>
                                 <th className="px-6 py-4 font-semibold">Role</th>
                                 <th className="px-6 py-4 font-semibold">Pricing Group</th>
+                                <th className="px-6 py-4 font-semibold">Address</th>
                                 <th className="px-6 py-4 font-semibold">City</th>
                                 <th className="px-6 py-4 font-semibold">Country</th>
                                 <th className="px-6 py-4 font-semibold">Status</th>
@@ -240,6 +241,7 @@ const Users = () => {
                                             <span className="text-sm text-slate-300 italic">No Group</span>
                                         )}
                                     </td>
+                                    <td className="px-6 py-4 text-slate-600 font-medium truncate max-w-[150px]" title={user.address}>{user.address || '-'}</td>
                                     <td className="px-6 py-4 text-slate-600 font-medium">{user.city || '-'}</td>
                                     <td className="px-6 py-4 text-slate-600 font-medium">{user.country || '-'}</td>
                                     <td className="px-6 py-4">
@@ -408,6 +410,32 @@ const Users = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">City</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="Enter city"
+                                        value={formData.city}
+                                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-6">
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">Address</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="Enter full address"
+                                        value={formData.address}
+                                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                    />
+                                </div>
+
+
+                                <div className="space-y-2">
                                     <label className="text-sm font-semibold text-slate-700">Product Pricing Group</label>
                                     <select
                                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 appearance-none"
@@ -422,29 +450,7 @@ const Users = () => {
                                         ))}
                                     </select>
                                 </div>
-                            </div>
 
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-slate-700">City</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                        placeholder="Enter city"
-                                        value={formData.city}
-                                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-slate-700">Address</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                        placeholder="Enter full address"
-                                        value={formData.address}
-                                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                    />
-                                </div>
                             </div>
 
                             <div className="flex gap-4 pt-4">
