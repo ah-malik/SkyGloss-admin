@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Search, Filter, MoreVertical, Trash2, Ban, CheckCircle, X, Loader2, Edit } from 'lucide-react';
+import { Search, Filter, MoreVertical, Trash2, Ban, CheckCircle, X, Loader2, Edit, Trophy } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const Users = () => {
@@ -189,14 +189,15 @@ const Users = () => {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50 text-slate-500 text-sm uppercase">
                             <tr>
-                                <th className="px-6 py-4 font-semibold">User</th>
-                                <th className="px-6 py-4 font-semibold">Role</th>
-                                <th className="px-6 py-4 font-semibold">Pricing Group</th>
-                                <th className="px-6 py-4 font-semibold">Address</th>
-                                <th className="px-6 py-4 font-semibold">City</th>
-                                <th className="px-6 py-4 font-semibold">Country</th>
-                                <th className="px-6 py-4 font-semibold">Status</th>
-                                <th className="px-6 py-4 font-semibold text-right">Actions</th>
+                                <th className="px-6 py-4 font-semibold ">User</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Role</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Pricing Group</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "150px" }}>Courses</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Address</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>City</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Country</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Status</th>
+                                <th className="px-6 py-4 font-semibold text-right" style={{ minWidth: "200px" }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -240,6 +241,16 @@ const Users = () => {
                                         ) : (
                                             <span className="text-sm text-slate-300 italic">No Group</span>
                                         )}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2">
+                                            <span className={`text-sm font-bold ${user.completedCourses?.length === 5 ? 'text-amber-500' : 'text-slate-700'}`}>
+                                                {user.completedCourses?.length || 0}/5
+                                            </span>
+                                            {user.completedCourses?.length === 5 && (
+                                                <Trophy size={16} className="text-amber-500 fill-amber-500" />
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 text-slate-600 font-medium truncate max-w-[150px]" title={user.address}>{user.address || '-'}</td>
                                     <td className="px-6 py-4 text-slate-600 font-medium">{user.city || '-'}</td>
