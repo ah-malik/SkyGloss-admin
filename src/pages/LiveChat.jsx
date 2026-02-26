@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import api from '../api/axios';
 import { Search, MessageCircle, Send, User, Clock, Loader2, X } from 'lucide-react';
@@ -13,6 +14,13 @@ const LiveChat = () => {
     const [isConnecting, setIsConnecting] = useState(false);
     const socketRef = useRef(null);
     const messagesEndRef = useRef(null);
+    const activeRoomIdRef = useRef(null); // Track active room for socket listeners
+    const [searchParams] = useSearchParams();
+    const initialRoomId = searchParams.get('roomId');
+
+    useEffect(() => {
+        activeRoomIdRef.current = activeRoom?._id;
+    }, [activeRoom?._id]);
 
     useEffect(() => {
         fetchRooms();
@@ -27,15 +35,18 @@ const LiveChat = () => {
 
         socket.on('new_message', (message) => {
             // Handle new messages globally or for active room
-            if (activeRoom?._id === message.roomId) {
-                setMessages(prev => [...prev, message]);
+            if (activeRoomIdRef.current === message.roomId) {
+                setMessages(prev => {
+                    if (prev.some(m => m._id === message._id)) return prev;
+                    return [...prev, message];
+                });
             }
             // Update room list last message
             setRooms(prev => prev.map(room =>
                 room._id === message.roomId
                     ? { ...room, lastMessage: message.message, lastMessageAt: new Date() }
                     : room
-            ));
+            ).sort((a, b) => new Date(b.lastMessageAt || 0) - new Date(a.lastMessageAt || 0)));
         });
 
         socket.on('message_notification', (data) => {
@@ -47,12 +58,20 @@ const LiveChat = () => {
         return () => {
             if (socket) socket.disconnect();
         };
-    }, [activeRoom?._id]);
+    }, []);
 
     const fetchRooms = async () => {
         try {
             const res = await api.get('/chat/rooms');
             setRooms(res.data);
+
+            // If we have a roomId from URL, find it and join
+            if (initialRoomId) {
+                const targetRoom = res.data.find(r => r._id === initialRoomId);
+                if (targetRoom) {
+                    joinRoom(targetRoom);
+                }
+            }
         } catch (err) {
             console.error("Failed to fetch chat rooms:", err);
         } finally {

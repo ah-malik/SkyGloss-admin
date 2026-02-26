@@ -14,6 +14,7 @@ import {
     MessageSquare
 } from 'lucide-react';
 import { useState } from 'react';
+import NotificationsBell from './NotificationsBell';
 
 const Layout = ({ children }) => {
     const { user, logout } = useAuth();
@@ -81,9 +82,31 @@ const Layout = ({ children }) => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-auto p-8">
-                {children}
-            </main>
+            <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+                {/* Header */}
+                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-20">
+                    <div className="flex items-center gap-4 text-slate-500">
+                        <h2 className="text-sm font-bold uppercase tracking-widest">
+                            {location.pathname === '/' ? 'Overview' : location.pathname.substring(1).replace(/-/g, ' ')}
+                        </h2>
+                    </div>
+                    <div className="flex items-center gap-6">
+                        <NotificationsBell />
+                        <div className="h-8 w-px bg-slate-200" />
+                        <div className="flex items-center gap-3">
+                            <div className="text-right hidden sm:block">
+                                <p className="text-xs font-bold text-slate-900">{user?.firstName} {user?.lastName}</p>
+                                <p className="text-[10px] text-slate-500 uppercase font-black">{user?.role?.replace(/_/g, ' ')}</p>
+                            </div>
+                            <UserCircle size={32} className="text-slate-400" />
+                        </div>
+                    </div>
+                </header>
+
+                <main className="flex-1 overflow-auto p-8">
+                    {children}
+                </main>
+            </div>
         </div>
     );
 };

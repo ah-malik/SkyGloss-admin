@@ -14,12 +14,14 @@ import {
 import api from "../api/axios";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
+import { useNotifications } from "../context/NotificationContext";
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
+    const { notifications } = useNotifications();
 
     useEffect(() => {
         fetchOrders();
@@ -143,8 +145,11 @@ const Orders = () => {
                                                     <Package className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-medium text-gray-900">
+                                                    <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
                                                         {order.orderNumber || order._id.slice(-6).toUpperCase()}
+                                                        {notifications.some(n => !n.isRead && (n.metadata?.orderId === order._id || n.metadata?.orderNumber === order.orderNumber)) && (
+                                                            <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" title="New activity" />
+                                                        )}
                                                     </p>
                                                     <p className="text-xs text-gray-500">
                                                         {order.items.length} items

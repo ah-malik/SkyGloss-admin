@@ -11,10 +11,12 @@ import {
     ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNotifications } from '../context/NotificationContext';
 
 const CertificationRequests = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { notifications } = useNotifications();
 
     const fetchRequests = async () => {
         try {
@@ -106,7 +108,12 @@ const CertificationRequests = () => {
                                                 <ShieldCheck size={20} />
                                             </div>
                                             <div>
-                                                <h3 className="font-semibold text-slate-900">{request.shopName}</h3>
+                                                <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+                                                    {request.shopName}
+                                                    {notifications.some(n => !n.isRead && n.metadata?.certificationId === request._id) && (
+                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white animate-pulse">NEW</span>
+                                                    )}
+                                                </h3>
                                                 <p className="text-sm text-slate-500">Requested by {request.distributor?.firstName} {request.distributor?.lastName} ({request.requesterName})</p>
                                             </div>
                                         </div>
