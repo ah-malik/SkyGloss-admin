@@ -34,6 +34,25 @@ const CertificationRequests = () => {
         fetchRequests();
     }, []);
 
+    // Listen for real-time notifications to auto-refresh
+    useEffect(() => {
+        if (notifications && notifications.length > 0) {
+            const latestCertPaid = notifications[0];
+            if (latestCertPaid.type === 'CERT_PAID' && !latestCertPaid.isRead) {
+                console.log('Real-time payment sync: Refreshing requests...');
+                fetchRequests();
+            }
+        }
+    }, [notifications]);
+
+    // Polling fallback every 30 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchRequests();
+        }, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
     const handleStatusUpdate = async (id, status) => {
         try {
             await api.patch(`/certifications/admin/${id}/status`, { status });
@@ -44,6 +63,23 @@ const CertificationRequests = () => {
             console.error(error);
         }
     };
+
+    const handleVerify = async (sessionId) => {
+        if (!sessionId) return;
+        try {
+            const response = await api.get(`/certifications/admin/verify-payment/${sessionId}`);
+            if (response.data.success) {
+                toast.success('Payment verified and updated!');
+                fetchRequests();
+            } else {
+                toast.error(`Stripe status: ${response.data.status}`);
+            }
+        } catch (error) {
+            toast.error('Verification failed');
+            console.error(error);
+        }
+    };
+
 
     const getStatusBadge = (status) => {
         switch (status) {
@@ -145,7 +181,17 @@ const CertificationRequests = () => {
 
                                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                         <div className="flex flex-col items-end gap-2">
-                                            {getPaymentBadge(request.paymentStatus)}
+                                            <div className="flex flex-col items-end gap-1">
+                                                {getPaymentBadge(request.paymentStatus)}
+                                                {request.paymentStatus !== 'paid' && request.stripeSessionId && (
+                                                    <button
+                                                        onClick={() => handleVerify(request.stripeSessionId)}
+                                                        className="text-[10px] text-blue-600 hover:underline font-bold"
+                                                    >
+                                                        Verify Payment
+                                                    </button>
+                                                )}
+                                            </div>
                                             {getStatusBadge(request.requestStatus)}
                                         </div>
 
