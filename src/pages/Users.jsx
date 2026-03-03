@@ -23,7 +23,9 @@ const Users = () => {
         country: '',
         productGroup: '',
         address: '',
-        city: ''
+        city: '',
+        latitude: '',
+        longitude: ''
     });
 
     useEffect(() => {
@@ -97,7 +99,9 @@ const Users = () => {
             country: user.country || '',
             productGroup: user.productGroup?._id || user.productGroup || '',
             address: user.address || '',
-            city: user.city || ''
+            city: user.city || '',
+            latitude: user.latitude ?? '',
+            longitude: user.longitude ?? ''
         });
         setIsAddModalOpen(true);
     };
@@ -116,24 +120,93 @@ const Users = () => {
             country: '',
             productGroup: '',
             address: '',
-            city: ''
+            city: '',
+            latitude: '',
+            longitude: ''
         });
         setIsAddModalOpen(true);
+    };
+
+    const handleGeocode = async () => {
+        if (!formData.city || !formData.country) {
+            toast.error('Please enter city and country first');
+            return;
+        }
+        try {
+            const query = `${formData.city}, ${formData.country}`;
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+            const data = await res.json();
+            if (data && data[0]) {
+                setFormData({
+                    ...formData,
+                    latitude: parseFloat(data[0].lat),
+                    longitude: parseFloat(data[0].lon)
+                });
+                toast.success('Coordinates found!');
+            } else {
+                toast.error('Coordinates not found for this location');
+            }
+        } catch (err) {
+            toast.error('Geocoding failed');
+        }
+    };
+
+    const fetchCoordinates = async (city, country) => {
+        try {
+            const query = `${city}, ${country}`;
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+            const data = await res.json();
+            if (data && data[0]) {
+                return {
+                    latitude: parseFloat(data[0].lat),
+                    longitude: parseFloat(data[0].lon)
+                };
+            }
+        } catch (err) {
+            console.error('Auto-geocoding failed:', err);
+        }
+        return null;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
+
+        // Auto-geocode if coordinates are missing
+        let finalFormData = { ...formData };
+        if (!finalFormData.latitude || !finalFormData.longitude) {
+            if (finalFormData.city && finalFormData.country) {
+                const coords = await fetchCoordinates(finalFormData.city, finalFormData.country);
+                if (coords) {
+                    finalFormData = { ...finalFormData, ...coords };
+                    setFormData(finalFormData); // Update UI state too
+                }
+            }
+        }
+
+        // Ensure coordinates are numbers or removed if empty string
+        if (finalFormData.latitude === '' || finalFormData.latitude === null || finalFormData.latitude === undefined) {
+            delete finalFormData.latitude;
+        } else {
+            finalFormData.latitude = parseFloat(finalFormData.latitude);
+        }
+
+        if (finalFormData.longitude === '' || finalFormData.longitude === null || finalFormData.longitude === undefined) {
+            delete finalFormData.longitude;
+        } else {
+            finalFormData.longitude = parseFloat(finalFormData.longitude);
+        }
+
         try {
             if (isEditMode) {
                 // Remove password from payload if empty
-                const payload = { ...formData };
+                const payload = { ...finalFormData };
                 if (!payload.password) delete payload.password;
 
                 await api.patch(`/users/${editingUserId}`, payload);
                 toast.success('User updated successfully');
             } else {
-                await api.post('/users', formData);
+                await api.post('/users', finalFormData);
                 toast.success('User created successfully');
             }
 
@@ -196,6 +269,7 @@ const Users = () => {
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Address</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>City</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Country</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "150px" }}>Lat/Lng</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Status</th>
                                 <th className="px-6 py-4 font-semibold text-right" style={{ minWidth: "200px" }}>Actions</th>
                             </tr>
@@ -255,6 +329,11 @@ const Users = () => {
                                     <td className="px-6 py-4 text-slate-600 font-medium truncate max-w-[150px]" title={user.address}>{user.address || '-'}</td>
                                     <td className="px-6 py-4 text-slate-600 font-medium">{user.city || '-'}</td>
                                     <td className="px-6 py-4 text-slate-600 font-medium">{user.country || '-'}</td>
+                                    <td className="px-6 py-4 text-slate-400 text-xs tabular-nums">
+                                        {(user.latitude !== undefined && user.latitude !== null && user.longitude !== undefined && user.longitude !== null) ? (
+                                            <span className="text-slate-600 font-medium">{user.latitude.toFixed(2)}, {user.longitude.toFixed(2)}</span>
+                                        ) : 'None'}
+                                    </td>
                                     <td className="px-6 py-4">
                                         <span className={`flex items-center gap-1.5 text-sm font-medium ${user.status === 'active' ? 'text-emerald-600' :
                                             user.status === 'pending' ? 'text-orange-500' :
@@ -418,6 +497,12 @@ const Users = () => {
                                         placeholder="USA"
                                         value={formData.country}
                                         onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                                        onBlur={async () => {
+                                            if (formData.city && formData.country && (formData.latitude === '' || formData.latitude === null || formData.latitude === undefined)) {
+                                                const coords = await fetchCoordinates(formData.city, formData.country);
+                                                if (coords) setFormData(prev => ({ ...prev, ...coords }));
+                                            }
+                                        }}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -428,7 +513,47 @@ const Users = () => {
                                         placeholder="Enter city"
                                         value={formData.city}
                                         onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                        onBlur={async () => {
+                                            if (formData.city && formData.country && (formData.latitude === '' || formData.latitude === null || formData.latitude === undefined)) {
+                                                const coords = await fetchCoordinates(formData.city, formData.country);
+                                                if (coords) setFormData(prev => ({ ...prev, ...coords }));
+                                            }
+                                        }}
                                     />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-6 items-end">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">Latitude</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="e.g. 33.44"
+                                        value={formData.latitude}
+                                        onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">Longitude</label>
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            step="any"
+                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                            placeholder="e.g. -112.07"
+                                            value={formData.longitude}
+                                            onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleGeocode}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs font-bold hover:bg-blue-200 transition-colors"
+                                        >
+                                            Get Coords
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
