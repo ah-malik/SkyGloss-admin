@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Package, ShieldCheck, MessageSquare, Clock, CheckCircle2 } from 'lucide-react';
+import { Bell, Package, ShieldCheck, MessageSquare, Clock, CheckCircle2, Video } from 'lucide-react';
 import { useNotifications } from '../context/NotificationContext';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
@@ -27,6 +27,8 @@ const NotificationsBell = () => {
             case 'CERT_REQUEST':
             case 'CERT_PAID':
                 return <ShieldCheck size={16} className="text-emerald-500" />;
+            case 'CERT_VIDEO_UPLOADED':
+                return <Video size={16} className="text-pink-500" />;
             case 'CHAT_MESSAGE':
                 return <MessageSquare size={16} className="text-purple-500" />;
             default:

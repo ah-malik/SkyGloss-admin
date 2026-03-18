@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, Package, ShieldCheck, MessageSquare, Clock, CheckCircle2, Search, Filter, Trash2, Calendar } from 'lucide-react';
+import { Bell, Package, ShieldCheck, MessageSquare, Clock, CheckCircle2, Search, Filter, Trash2, Calendar, Video } from 'lucide-react';
 import { useNotifications } from '../context/NotificationContext';
 import { format } from 'date-fns';
 
@@ -17,6 +17,8 @@ const Notifications = () => {
             case 'CERT_REQUEST':
             case 'CERT_PAID':
                 return <ShieldCheck size={20} className="text-emerald-500" />;
+            case 'CERT_VIDEO_UPLOADED':
+                return <Video size={20} className="text-pink-500" />;
             case 'CHAT_MESSAGE':
                 return <MessageSquare size={20} className="text-purple-500" />;
             default:

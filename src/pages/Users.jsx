@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import api from '../api/axios';
 import { Country, State, City } from 'country-state-city';
-import { Search, Filter, MoreVertical, Trash2, Ban, CheckCircle, X, Loader2, Edit, Trophy } from 'lucide-react';
+import { Search, Filter, MoreVertical, Trash2, Ban, CheckCircle, X, Loader2, Edit, Trophy, Video } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const normalizeName = (name) => {
@@ -11,6 +11,34 @@ const normalizeName = (name) => {
         .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
         .replace(/ı/g, 'i') // Special handling for Turkish dotless i
         .replace(/İ/g, 'I'); // Special handling for Turkish dotted I
+};
+
+const COURSE_STEPS = {
+    UNDERSTANDING_SKYGLOSS: 9,
+    FUSION: 13,
+    RESIN_FILM: 4,
+    SHINE: 3,
+    MATTE: 3,
+    SEAL: 3,
+};
+
+const getCompletedCoursesCount = (user) => {
+    if (!user) return 0;
+
+    let count = 0;
+    const legacyCount = user.completedCourses?.length || 0;
+
+    if (user.courseProgress) {
+        Object.entries(COURSE_STEPS).forEach(([courseKey, totalSteps]) => {
+            const progress = user.courseProgress[courseKey] || user.courseProgress[courseKey.replace('_', ' ')] || [];
+            if (progress && progress.length >= totalSteps) {
+                count++;
+            }
+        });
+    }
+
+    // Return whichever is higher to prevent regressions
+    return Math.max(count, legacyCount);
 };
 
 const Users = () => {
@@ -315,6 +343,7 @@ const Users = () => {
                                 <th className="px-6 py-4 font-semibold ">User</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Role</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Pricing Group</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "100px" }}>Video</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "150px" }}>Courses</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Address</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>City</th>
@@ -367,11 +396,26 @@ const Users = () => {
                                         )}
                                     </td>
                                     <td className="px-6 py-4">
+                                        {user.certificationVideoUrl ? (
+                                            <a
+                                                href={user.certificationVideoUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-center p-2 rounded-lg bg-pink-50 text-pink-600 hover:bg-pink-100 transition-colors w-10 h-10 shadow-sm"
+                                                title="Watch Certification Video"
+                                            >
+                                                <Video size={18} />
+                                            </a>
+                                        ) : (
+                                            <span className="text-slate-300">-</span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-sm font-bold ${user.completedCourses?.length === 5 ? 'text-amber-500' : 'text-slate-700'}`}>
-                                                {user.completedCourses?.length || 0}/5
+                                            <span className={`text-sm font-bold ${getCompletedCoursesCount(user) === 6 ? 'text-amber-500' : 'text-slate-700'}`}>
+                                                {getCompletedCoursesCount(user)}/6
                                             </span>
-                                            {user.completedCourses?.length === 5 && (
+                                            {getCompletedCoursesCount(user) === 6 && (
                                                 <Trophy size={16} className="text-amber-500 fill-amber-500" />
                                             )}
                                         </div>
