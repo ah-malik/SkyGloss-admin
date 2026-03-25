@@ -245,6 +245,9 @@ const OrderDetails = () => {
                                 Shipping Address
                             </h2>
                             <p className="text-sm text-gray-600 leading-relaxed">
+                                {order.shippingAddress?.companyName && (
+                                    <><strong>{order.shippingAddress.companyName}</strong><br /></>
+                                )}
                                 {order.shippingAddress?.address}<br />
                                 {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}<br />
                                 {order.shippingAddress?.country}
