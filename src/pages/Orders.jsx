@@ -160,11 +160,11 @@ const Orders = () => {
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium uppercase ${order.user?.role === 'shop'
                                                 ? 'bg-emerald-100 text-emerald-800'
-                                                : order.user?.role === 'distributor'
+                                                : ['master_partner', 'regional_partner', 'partner'].includes(order.user?.role)
                                                     ? 'bg-indigo-100 text-indigo-800'
                                                     : 'bg-gray-100 text-gray-800'
                                                 }`}>
-                                                {order.user?.role || 'Unknown'}
+                                                {order.user?.role?.replace(/_/g, ' ') || 'Unknown'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">

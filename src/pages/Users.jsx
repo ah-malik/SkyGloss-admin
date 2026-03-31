@@ -56,16 +56,14 @@ const Users = () => {
         email: '',
         firstName: '',
         lastName: '',
-        role: 'master_distributor',
+        role: 'master_partner',
         password: '',
         phoneNumber: '',
         companyName: '',
-        country: '',
-        productGroup: '',
-        address: '',
         city: '',
         latitude: '',
-        longitude: ''
+        longitude: '',
+        partnerCode: ''
     });
 
     useEffect(() => {
@@ -132,7 +130,7 @@ const Users = () => {
             email: user.email || '',
             firstName: user.firstName || '',
             lastName: user.lastName || '',
-            role: user.role || 'master_distributor',
+            role: user.role || 'master_partner',
             password: '', // Leave blank for edit
             phoneNumber: user.phoneNumber || '',
             companyName: user.companyName || '',
@@ -141,7 +139,8 @@ const Users = () => {
             address: user.address || '',
             city: user.city || '',
             latitude: user.latitude ?? '',
-            longitude: user.longitude ?? ''
+            longitude: user.longitude ?? '',
+            partnerCode: user.partnerCode || ''
         });
 
         // Load cities and states for the selected country
@@ -184,7 +183,8 @@ const Users = () => {
             address: '',
             city: '',
             latitude: '',
-            longitude: ''
+            longitude: '',
+            partnerCode: ''
         });
         setCities([]);
         setIsAddModalOpen(true);
@@ -308,7 +308,7 @@ const Users = () => {
             <div className="flex justify-between items-end">
                 <div>
                     <h1 className="text-2xl font-bold">User Management</h1>
-                    <p className="text-slate-500">Manage all registered users and their permissions</p>
+                    <p className="text-slate-500">Manage all registered users, partners and their permissions</p>
                 </div>
                 <button
                     onClick={handleOpenAddModal}
@@ -340,7 +340,8 @@ const Users = () => {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50 text-slate-500 text-sm uppercase">
                             <tr>
-                                <th className="px-6 py-4 font-semibold ">User</th>
+                                <th className="px-6 py-4 font-semibold">User</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "150px" }}>Partner ID</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Role</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Pricing Group</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "100px" }}>Video</th>
@@ -371,11 +372,21 @@ const Users = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
+                                        {user.partnerCode ? (
+                                            <span className="font-mono text-sm font-bold text-[#0EA0DC] bg-[#0EA0DC]/5 px-2 py-1 rounded">
+                                                {user.partnerCode}
+                                            </span>
+                                        ) : (
+                                            <span className="text-slate-300">-</span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                                            user.role === 'master_distributor' ? 'bg-indigo-100 text-indigo-700' :
-                                                user.role === 'regional_distributor' ? 'bg-blue-100 text-blue-700' :
-                                                    user.role === 'certified_shop' ? 'bg-emerald-100 text-emerald-700' :
-                                                        'bg-slate-100 text-slate-700'
+                                            user.role === 'master_partner' ? 'bg-indigo-100 text-indigo-700' :
+                                                user.role === 'regional_partner' ? 'bg-blue-100 text-blue-700' :
+                                                    user.role === 'partner' ? 'bg-sky-100 text-sky-700' :
+                                                        user.role === 'certified_shop' ? 'bg-emerald-100 text-emerald-700' :
+                                                            'bg-slate-100 text-slate-700'
                                             }`}>
                                             {user.role?.replace(/_/g, ' ')}
                                         </span>
@@ -430,12 +441,12 @@ const Users = () => {
                                         ) : 'None'}
                                     </td>
                                     <td className="px-6 py-4 text-sm">
-                                        {user.role === 'regional_distributor' ? (
+                                        {(user.role === 'regional_partner' || user.role === 'certified_shop') ? (
                                             !user.isSelfRegistered ? (
                                                 <span className="px-2 py-1 bg-slate-100 text-slate-500 rounded text-[10px] font-bold uppercase tracking-wider">Admin Created</span>
                                             ) : (
-                                                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${user.isDistributorPaid ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
-                                                    {user.isDistributorPaid ? 'Paid' : 'Unpaid'}
+                                                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${user.isPartnerPaid ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
+                                                    {user.isPartnerPaid ? 'Paid' : 'Unpaid'}
                                                 </span>
                                             )
                                         ) : (
@@ -578,8 +589,9 @@ const Users = () => {
                                         value={formData.role}
                                         onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                                     >
-                                        <option value="master_distributor">Master Distributor</option>
-                                        <option value="regional_distributor">Regional Distributor</option>
+                                        <option value="master_partner">Master Partner</option>
+                                        <option value="regional_partner">Regional Partner</option>
+                                        <option value="partner">Partner</option>
                                         <option value="certified_shop">Certified Shop</option>
                                         <option value="admin">Administrator</option>
                                     </select>
@@ -595,6 +607,33 @@ const Users = () => {
                                     />
                                 </div>
                             </div>
+
+                            {/* Partner Code Field - Only for Partner Roles */}
+                            {['master_partner', 'regional_partner', 'partner'].includes(formData.role) && (
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">
+                                        Partner Code (6 Digits) <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        required
+                                        maxLength={6}
+                                        pattern="\d{6}"
+                                        readOnly={isEditMode}
+                                        className={`w-full px-4 py-2.5 rounded-xl border transition-all ${isEditMode
+                                            ? 'bg-slate-100 border-slate-200 text-slate-500 cursor-not-allowed'
+                                            : 'bg-slate-50 border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20'
+                                            }`}
+                                        placeholder="123456"
+                                        value={formData.partnerCode}
+                                        onChange={(e) => {
+                                            const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                                            setFormData({ ...formData, partnerCode: val });
+                                        }}
+                                    />
+                                    {!isEditMode && <p className="text-[10px] text-slate-400">Enter a unique 6-digit code for this partner.</p>}
+                                </div>
+                            )}
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">

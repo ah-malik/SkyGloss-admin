@@ -131,7 +131,7 @@ const CertificationRequests = () => {
                     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
                         <ShieldCheck className="mx-auto h-12 w-12 text-slate-300" />
                         <h3 className="mt-4 text-lg font-medium text-slate-900">No requests found</h3>
-                        <p className="mt-2 text-slate-500">When distributors request certifications, they will appear here.</p>
+                        <p className="mt-2 text-slate-500">When partners request certifications, they will appear here.</p>
                     </div>
                 ) : (
                     requests.map((request) => (
@@ -150,7 +150,7 @@ const CertificationRequests = () => {
                                                         <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white animate-pulse">NEW</span>
                                                     )}
                                                 </h3>
-                                                <p className="text-sm text-slate-500">Requested by {request.distributor?.firstName} {request.distributor?.lastName} ({request.requesterName})</p>
+                                                <p className="text-sm text-slate-500">Requested by {request.partner?.firstName} {request.partner?.lastName} ({request.requesterName})</p>
                                             </div>
                                         </div>
 

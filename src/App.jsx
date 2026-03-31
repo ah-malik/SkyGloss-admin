@@ -43,7 +43,7 @@ function App() {
             {/* Legacy Redirects */}
             <Route path="/chat/:id" element={<ChatRedirect />} />
 
-            <Route element={<ProtectedRoute allowedRoles={['admin', 'master_distributor', 'regional_distributor']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'master_partner', 'regional_partner']} />}>
               <Route element={<Layout children={<Dashboard />} />} path="/" />
               <Route element={<Layout children={<Users />} />} path="/users" />
               <Route element={<Layout children={<AccessCodes />} />} path="/access-codes" />

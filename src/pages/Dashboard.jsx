@@ -33,8 +33,9 @@ const Dashboard = () => {
 
     const cards = [
         { label: 'Total Users', value: stats?.total || 0, icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
-        { label: 'Master Distributors', value: stats?.distributor || stats?.master_distributor || 0, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-100' },
-        { label: 'Certified Shops', value: stats?.shop || stats?.certified_shop || 0, icon: Store, color: 'text-emerald-600', bg: 'bg-emerald-100' },
+        { label: 'Master Partners', value: stats?.master_partner || 0, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-100' },
+        { label: 'Regional Partners', value: stats?.regional_partner || 0, icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
+        { label: 'Certified Shops', value: stats?.certified_shop || 0, icon: Store, color: 'text-emerald-600', bg: 'bg-emerald-100' },
         { label: 'Total Revenue', value: `$${orderStats?.totalRevenue?.toFixed(2) || '0.00'}`, icon: DollarSign, color: 'text-green-600', bg: 'bg-green-100' },
     ];
 

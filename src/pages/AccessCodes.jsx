@@ -14,7 +14,7 @@ const AccessCodes = () => {
         totalPages: 0
     });
     const [newCodeData, setNewCodeData] = useState({
-        targetRole: 'shop',
+        targetRole: 'certified_shop',
         expiresInDays: 7
     });
 
@@ -123,9 +123,9 @@ const AccessCodes = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${item.targetRole === 'shop' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'
+                                        <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${item.targetRole === 'certified_shop' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'
                                             }`}>
-                                            {item.targetRole}
+                                            {item.targetRole?.replace('_', ' ')}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
@@ -222,7 +222,7 @@ const AccessCodes = () => {
                                     value={newCodeData.targetRole}
                                     onChange={(e) => setNewCodeData({ ...newCodeData, targetRole: e.target.value })}
                                 >
-                                    <option value="shop">Shop (Non-USA)</option>
+                                    <option value="certified_shop">Certified Shop (Non-USA)</option>
                                 </select>
                             </div>
                             <div>

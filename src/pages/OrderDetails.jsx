@@ -198,8 +198,8 @@ const OrderDetails = () => {
                                     <div className="flex flex-col gap-1">
                                         <p className="text-sm font-bold text-gray-900">{order.user.firstName} {order.user.lastName}</p>
                                         <p className="text-xs text-gray-600">{order.user.email}</p>
-                                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase w-fit mt-1 ${order.user.role === 'distributor' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700'}`}>
-                                            Account: {order.user.role}
+                                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase w-fit mt-1 ${['master_partner', 'regional_partner', 'partner'].includes(order.user.role) ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700'}`}>
+                                            Account: {order.user.role?.replace(/_/g, ' ')}
                                         </span>
                                     </div>
                                 </div>
