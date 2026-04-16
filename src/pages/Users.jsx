@@ -92,10 +92,7 @@ const Users = () => {
     };
 
     const handleStatusChange = async (userId, userRole, newStatus) => {
-        if (userRole === 'admin') {
-            alert('Administrator status cannot be changed');
-            return;
-        }
+        // Role-based restrictions removed to allow full admin control
         try {
             await api.patch(`/users/${userId}`, { status: newStatus });
             fetchUsers(); // Refresh
@@ -105,10 +102,7 @@ const Users = () => {
     };
 
     const handleDelete = async (userId, userRole) => {
-        if (userRole === 'admin') {
-            toast.error('Administrator accounts cannot be deleted');
-            return;
-        }
+        // Role-based restrictions removed to allow full admin control
 
         if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
             return;
@@ -467,44 +461,39 @@ const Users = () => {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2">
-                                            {user.role !== 'admin' ? (
-                                                <>
-                                                    {user.status !== 'active' && (
-                                                        <button
-                                                            onClick={() => handleStatusChange(user._id, user.role, 'active')}
-                                                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg"
-                                                            title="Activate"
-                                                        >
-                                                            <CheckCircle size={18} />
-                                                        </button>
-                                                    )}
-                                                    {user.status !== 'blocked' && (
-                                                        <button
-                                                            onClick={() => handleStatusChange(user._id, user.role, 'blocked')}
-                                                            className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg"
-                                                            title="Block"
-                                                        >
-                                                            <Ban size={18} />
-                                                        </button>
-                                                    )}
-                                                    <button
-                                                        onClick={() => handleEdit(user)}
-                                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                                                        title="Edit"
-                                                    >
-                                                        <Edit size={18} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(user._id, user.role)}
-                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                                                        title="Delete"
-                                                    >
-                                                        <Trash2 size={18} />
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <span className="text-xs text-slate-400 font-medium px-2 py-1">Protected</span>
+                                            {/* Full administrative control enabled for all roles */}
+                                            {user.status !== 'active' && (
+                                                <button
+                                                    onClick={() => handleStatusChange(user._id, user.role, 'active')}
+                                                    className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg"
+                                                    title="Activate"
+                                                >
+                                                    <CheckCircle size={18} />
+                                                </button>
                                             )}
+                                            {user.status !== 'blocked' && (
+                                                <button
+                                                    onClick={() => handleStatusChange(user._id, user.role, 'blocked')}
+                                                    className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg"
+                                                    title="Block"
+                                                >
+                                                    <Ban size={18} />
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => handleEdit(user)}
+                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                                                title="Edit"
+                                            >
+                                                <Edit size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(user._id, user.role)}
+                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                                                title="Delete"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -608,30 +597,27 @@ const Users = () => {
                                 </div>
                             </div>
 
-                            {/* Partner Code Field - Only for Partner Roles */}
-                            {['master_partner', 'regional_partner', 'partner'].includes(formData.role) && (
+                            {/* Partner Code Field - Available for all roles in management */}
+                            {(['master_partner', 'regional_partner', 'partner'].includes(formData.role) || isEditMode) && (
                                 <div className="space-y-2">
                                     <label className="text-sm font-semibold text-slate-700">
-                                        Partner Code (6 Digits) <span className="text-red-500">*</span>
+                                        Partner Code <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         required
-                                        maxLength={6}
-                                        pattern="\d{6}"
-                                        readOnly={isEditMode}
-                                        className={`w-full px-4 py-2.5 rounded-xl border transition-all ${isEditMode
-                                            ? 'bg-slate-100 border-slate-200 text-slate-500 cursor-not-allowed'
-                                            : 'bg-slate-50 border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20'
-                                            }`}
-                                        placeholder="123456"
+                                        maxLength={10}
+                                        pattern="[a-zA-Z0-9]{4,10}"
+                                        readOnly={false}
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        placeholder="1234567890"
                                         value={formData.partnerCode}
                                         onChange={(e) => {
-                                            const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                                            const val = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 10);
                                             setFormData({ ...formData, partnerCode: val });
                                         }}
                                     />
-                                    {!isEditMode && <p className="text-[10px] text-slate-400">Enter a unique 6-digit code for this partner.</p>}
+                                    {!isEditMode && <p className="text-[10px] text-slate-400">Enter a unique 4-10 character code for this partner.</p>}
                                 </div>
                             )}
 

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import NotificationsBell from './NotificationsBell';
+import logo from '../assets/logo.svg'
 
 const Layout = ({ children }) => {
     const { user, logout } = useAuth();
@@ -39,7 +40,7 @@ const Layout = ({ children }) => {
             {/* Sidebar */}
             <aside className={`bg-slate-900 text-white transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'} flex flex-col`}>
                 <div className="p-6 flex items-center justify-between">
-                    {isSidebarOpen && <span className="font-bold text-xl tracking-tight">ADMIN</span>}
+                    {isSidebarOpen && <img src={logo}/>}
                     <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-1 hover:bg-slate-800 rounded">
                         {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
                     </button>
