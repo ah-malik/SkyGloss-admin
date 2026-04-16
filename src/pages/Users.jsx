@@ -598,14 +598,14 @@ const Users = () => {
                             </div>
 
                             {/* Partner Code Field - Available for all roles in management */}
-                            {(['master_partner', 'regional_partner', 'partner'].includes(formData.role) || isEditMode) && (
+                            {['master_partner', 'regional_partner', 'partner'].includes(formData.role) && (
                                 <div className="space-y-2">
                                     <label className="text-sm font-semibold text-slate-700">
                                         Partner Code <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
-                                        required
+                                        required={['master_partner', 'regional_partner', 'partner'].includes(formData.role)}
                                         maxLength={10}
                                         pattern="[a-zA-Z0-9]{4,10}"
                                         readOnly={false}
