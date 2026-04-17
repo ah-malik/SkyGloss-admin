@@ -109,6 +109,24 @@ const Users = () => {
         }
     };
 
+    const handlePaymentToggle = async (user) => {
+        try {
+            const newPaidStatus = !user.isPartnerPaid;
+            const payload = { isPartnerPaid: newPaidStatus };
+
+            // If marking as paid, also set status to active
+            if (newPaidStatus) {
+                payload.status = 'active';
+            }
+
+            await api.patch(`/users/${user._id}`, payload);
+            toast.success(`User marked as ${newPaidStatus ? 'Paid' : 'Unpaid'}`);
+            fetchUsers();
+        } catch (err) {
+            toast.error('Failed to update payment status');
+        }
+    };
+
     const handleDelete = async (userId, userRole) => {
         // Role-based restrictions removed to allow full admin control
 
@@ -468,14 +486,21 @@ const Users = () => {
                                         ) : 'None'}
                                     </td>
                                     <td className="px-6 py-4 text-sm">
-                                        {(user.role === 'regional_partner' || user.role === 'certified_shop') ? (
-                                            !user.isSelfRegistered ? (
-                                                <span className="px-2 py-1 bg-slate-100 text-slate-500 rounded text-[10px] font-bold uppercase tracking-wider">Admin Created</span>
-                                            ) : (
-                                                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${user.isPartnerPaid ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
-                                                    {user.isPartnerPaid ? 'Paid' : 'Unpaid'}
-                                                </span>
-                                            )
+                                        {user.role !== 'admin' ? (
+                                            <button
+                                                onClick={() => handlePaymentToggle(user)}
+                                                className={`group relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${user.isPartnerPaid
+                                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100'
+                                                    : 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100'
+                                                    }`}
+                                                title={`Click to mark as ${user.isPartnerPaid ? 'Unpaid' : 'Paid'}`}
+                                            >
+                                                <div className={`w-1.5 h-1.5 rounded-full ${user.isPartnerPaid ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                                                {user.isPartnerPaid ? 'Paid' : 'Unpaid'}
+                                                {!user.isSelfRegistered && (
+                                                    <span className="opacity-40 text-[8px] italic ml-1">(Admin Created)</span>
+                                                )}
+                                            </button>
                                         ) : (
                                             <span className="text-slate-300">-</span>
                                         )}
