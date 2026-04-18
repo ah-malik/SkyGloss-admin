@@ -24,7 +24,6 @@ const Login = () => {
             setLoading(false);
         }
     };
-
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-slate-950 px-4">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950 opacity-50" />
