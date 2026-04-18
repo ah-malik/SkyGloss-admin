@@ -1,0 +1,11 @@
+/* Minimal CSS as everything is handled by Tailwind v4 */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
