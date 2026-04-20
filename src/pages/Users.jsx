@@ -4,6 +4,13 @@ import { Country, State, City } from 'country-state-city';
 import { Search, Filter, MoreVertical, Trash2, Ban, CheckCircle, X, Loader2, Edit, Trophy, Video, Globe, Facebook, Instagram, Youtube, Linkedin, Info } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
+const normalizeUrl = (url) => {
+    if (!url || url.trim() === '') return '';
+    const trimmed = url.trim();
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return `https://${trimmed}`;
+};
+
 const normalizeName = (name) => {
     if (!name) return '';
     return name
@@ -297,6 +304,14 @@ const Users = () => {
                 }
             }
         }
+
+        // Normalize URLs
+        finalFormData.website = normalizeUrl(finalFormData.website);
+        finalFormData.facebook = normalizeUrl(finalFormData.facebook);
+        finalFormData.instagram = normalizeUrl(finalFormData.instagram);
+        finalFormData.youtube = normalizeUrl(finalFormData.youtube);
+        finalFormData.tiktok = normalizeUrl(finalFormData.tiktok);
+        finalFormData.linkedin = normalizeUrl(finalFormData.linkedin);
 
         // Ensure coordinates are numbers or removed if empty string
         if (finalFormData.latitude === '' || finalFormData.latitude === null || finalFormData.latitude === undefined) {
@@ -855,7 +870,7 @@ const Users = () => {
                                             <Globe size={14} /> Website
                                         </label>
                                         <input
-                                            type="url"
+                                            type="text"
                                             className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                             placeholder="https://..."
                                             value={formData.website}
