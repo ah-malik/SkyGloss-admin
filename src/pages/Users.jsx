@@ -118,6 +118,17 @@ const Users = () => {
         }
     };
 
+    const handleCertificationToggle = async (user) => {
+        try {
+            const newCertStatus = !user.isCertified;
+            await api.patch(`/users/${user._id}`, { isCertified: newCertStatus });
+            toast.success(`User certification ${newCertStatus ? 'Approved' : 'Removed'}`);
+            fetchUsers();
+        } catch (err) {
+            toast.error('Failed to update certification status');
+        }
+    };
+
     const handlePaymentToggle = async (user) => {
         try {
             const newPaidStatus = !user.isPartnerPaid;
@@ -527,21 +538,34 @@ const Users = () => {
                                             user.status === 'pending' ? 'text-orange-500' :
                                                 'text-red-500'
                                             }`}>
-                                            <span className={`w-2 h-2 rounded-full ${user.status === 'active' ? 'bg-emerald-500' :
-                                                user.status === 'pending' ? 'bg-orange-500' :
-                                                    'bg-red-500'
+                                            <span className={`w-2 h-2 rounded-full ${user.isCertified ? 'bg-emerald-500' :
+                                                user.isTrainingComplete ? 'bg-amber-500' :
+                                                    user.status === 'active' ? 'bg-emerald-500' :
+                                                        user.status === 'pending' ? 'bg-orange-500' :
+                                                            'bg-red-500'
                                                 }`} />
-                                            {user.status === 'active' ? 'Certified' : user.status}
+                                            {user.isCertified ? 'SkyGloss Certified' :
+                                                user.isTrainingComplete ? 'Pending Approval' :
+                                                    user.status === 'active' ? 'Active' : user.status}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2">
                                             {/* Full administrative control enabled for all roles */}
+                                            {user.role === 'certified_shop' && (
+                                                <button
+                                                    onClick={() => handleCertificationToggle(user)}
+                                                    className={`p-2 rounded-lg transition-colors ${user.isCertified ? 'text-amber-500 hover:bg-amber-50' : 'text-slate-400 hover:bg-slate-50'}`}
+                                                    title={user.isCertified ? "Remove Certification" : "Approve Certification"}
+                                                >
+                                                    <Trophy size={18} fill={user.isCertified ? "currentColor" : "none"} />
+                                                </button>
+                                            )}
                                             {user.status !== 'active' && (
                                                 <button
                                                     onClick={() => handleStatusChange(user._id, user.role, 'active')}
                                                     className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg"
-                                                    title="Certify"
+                                                    title="Activate User"
                                                 >
                                                     <CheckCircle size={18} />
                                                 </button>
