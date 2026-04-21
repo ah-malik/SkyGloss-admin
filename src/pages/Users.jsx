@@ -21,12 +21,14 @@ const normalizeName = (name) => {
 };
 
 const COURSE_STEPS = {
+    WELCOME_TO_SKYGLOSS: 18,
     UNDERSTANDING_SKYGLOSS: 9,
-    FUSION: 13,
-    RESIN_FILM: 4,
-    SHINE: 3,
-    MATTE: 3,
-    SEAL: 3,
+    SKYGLOSS_SHOP_SETUP: 4,
+    FUSION: 20,
+    RESIN_FILM: 7,
+    SHINE: 6,
+    MATTE: 6,
+    SEAL: 5,
 };
 
 const getCompletedCoursesCount = (user) => {
@@ -484,10 +486,10 @@ const Users = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-sm font-bold ${getCompletedCoursesCount(user) === 6 ? 'text-amber-500' : 'text-slate-700'}`}>
-                                                {getCompletedCoursesCount(user)}/6
+                                            <span className={`text-sm font-bold ${getCompletedCoursesCount(user) === 8 ? 'text-amber-500' : 'text-slate-700'}`}>
+                                                {getCompletedCoursesCount(user)}/8
                                             </span>
-                                            {getCompletedCoursesCount(user) === 6 && (
+                                            {getCompletedCoursesCount(user) === 8 && (
                                                 <Trophy size={16} className="text-amber-500 fill-amber-500" />
                                             )}
                                         </div>
