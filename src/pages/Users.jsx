@@ -501,7 +501,7 @@ const Users = () => {
                                         ) : 'None'}
                                     </td>
                                     <td className="px-6 py-4 text-sm">
-                                        {user.role !== 'admin' ? (
+                                        {user.role !== 'admin' && !['master_partner', 'regional_partner', 'partner'].includes(user.role) ? (
                                             <button
                                                 onClick={() => handlePaymentToggle(user)}
                                                 className={`group relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${user.isPartnerPaid
@@ -529,7 +529,7 @@ const Users = () => {
                                                 user.status === 'pending' ? 'bg-orange-500' :
                                                     'bg-red-500'
                                                 }`} />
-                                            {user.status}
+                                            {user.status === 'active' ? 'Certified' : user.status}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
@@ -539,7 +539,7 @@ const Users = () => {
                                                 <button
                                                     onClick={() => handleStatusChange(user._id, user.role, 'active')}
                                                     className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg"
-                                                    title="Activate"
+                                                    title="Certify"
                                                 >
                                                     <CheckCircle size={18} />
                                                 </button>
@@ -832,34 +832,34 @@ const Users = () => {
                                     </select>
                                 </div>
 
-                            </div>
-
-                            {/* Payment & Status Section */}
-                            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <label className="text-sm font-semibold text-slate-700">Payment Status</label>
-                                        <div className="group relative">
-                                            <Info size={14} className="text-slate-400" />
-                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                                                Manually marking a user as PAID will also set their status to ACTIVE.
+                                                {/* Payment & Status Section */}
+                            {!['master_partner', 'regional_partner', 'partner'].includes(formData.role) && (
+                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-sm font-semibold text-slate-700">Payment Status</label>
+                                            <div className="group relative">
+                                                <Info size={14} className="text-slate-400" />
+                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                                    Manually marking a user as PAID will also set their status to CERTIFIED.
+                                                </div>
                                             </div>
                                         </div>
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                className="sr-only peer"
+                                                checked={formData.isPartnerPaid}
+                                                onChange={(e) => setFormData({ ...formData, isPartnerPaid: e.target.checked })}
+                                            />
+                                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                            <span className={`ml-3 text-xs font-bold uppercase transition-colors ${formData.isPartnerPaid ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                                {formData.isPartnerPaid ? 'Paid' : 'Unpaid'}
+                                            </span>
+                                        </label>
                                     </div>
-                                    <label className="relative inline-flex items-center cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only peer"
-                                            checked={formData.isPartnerPaid}
-                                            onChange={(e) => setFormData({ ...formData, isPartnerPaid: e.target.checked })}
-                                        />
-                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                                        <span className={`ml-3 text-xs font-bold uppercase transition-colors ${formData.isPartnerPaid ? 'text-emerald-600' : 'text-slate-400'}`}>
-                                            {formData.isPartnerPaid ? 'Paid' : 'Unpaid'}
-                                        </span>
-                                    </label>
                                 </div>
-                            </div>
+                            )}            </div>
 
                             {/* Online Presence & Socials */}
                             <div className="space-y-4 pt-4 border-t border-slate-100">
