@@ -58,6 +58,9 @@ export const NotificationProvider = ({ children }) => {
             newSocket.on('new_notification', (notification) => {
                 console.log('Received new notification:', notification);
 
+                // Filter out self-triggered notifications
+                if (notification.triggeredBy === 'admin') return;
+
                 setNotifications(prev => {
                     if (notification.type === 'CHAT_MESSAGE' && notification.metadata?.roomId) {
                         const existingIndex = prev.findIndex(n => n.type === 'CHAT_MESSAGE' && n.metadata?.roomId === notification.metadata?.roomId && !n.isRead);
