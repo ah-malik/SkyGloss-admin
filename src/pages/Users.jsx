@@ -515,20 +515,27 @@ const Users = () => {
                                     </td>
                                     <td className="px-6 py-4 text-sm">
                                         {user.role !== 'admin' && !['master_partner', 'regional_partner', 'partner'].includes(user.role) ? (
-                                            <button
-                                                onClick={() => handlePaymentToggle(user)}
-                                                className={`group relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${user.isPartnerPaid
-                                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100'
-                                                    : 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100'
-                                                    }`}
-                                                title={`Click to mark as ${user.isPartnerPaid ? 'Unpaid' : 'Paid'}`}
-                                            >
-                                                <div className={`w-1.5 h-1.5 rounded-full ${user.isPartnerPaid ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                                                {user.isPartnerPaid ? 'Paid' : 'Unpaid'}
-                                                {!user.isSelfRegistered && (
-                                                    <span className="opacity-40 text-[8px] italic ml-1">(Admin Created)</span>
+                                            <div className="flex flex-col items-start gap-1">
+                                                <button
+                                                    onClick={() => handlePaymentToggle(user)}
+                                                    className={`group relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${user.isPartnerPaid
+                                                        ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100'
+                                                        : 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100'
+                                                        }`}
+                                                    title={`Click to mark as ${user.isPartnerPaid ? 'Unpaid' : 'Paid'}`}
+                                                >
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${user.isPartnerPaid ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                                                    {user.isPartnerPaid ? 'Paid' : 'Unpaid'}
+                                                    {!user.isSelfRegistered && (
+                                                        <span className="opacity-40 text-[8px] italic ml-1">(Admin Created)</span>
+                                                    )}
+                                                </button>
+                                                {(user.couponCode || (user.isSelfRegistered && user.isPartnerPaid && !user.stripeSessionId)) && (
+                                                    <span className="text-[10px] font-medium text-slate-400 italic lowercase ml-1">
+                                                        registered with coupon code
+                                                    </span>
                                                 )}
-                                            </button>
+                                            </div>
                                         ) : (
                                             <span className="text-slate-300">-</span>
                                         )}
