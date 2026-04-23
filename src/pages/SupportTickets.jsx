@@ -10,6 +10,7 @@ const SupportTickets = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [selectedTicket, setSelectedTicket] = useState(null);
+    const [replyText, setReplyText] = useState("");
 
     useEffect(() => {
         fetchTickets();
@@ -39,6 +40,20 @@ const SupportTickets = () => {
         } catch (err) {
             console.error("Failed to update ticket status:", err);
             toast.error("Failed to update ticket status");
+        }
+    };
+
+    const replyTicket = async () => {
+        if (!replyText.trim()) return toast.error("Reply cannot be empty");
+        try {
+            const res = await api.patch(`/support/${selectedTicket._id}`, { adminReply: replyText, status: 'resolved' });
+            setTickets(tickets.map(ticket => ticket._id === selectedTicket._id ? res.data : ticket));
+            setSelectedTicket(res.data);
+            setReplyText("");
+            toast.success("Reply sent and ticket resolved!");
+        } catch (err) {
+            console.error("Failed to send reply:", err);
+            toast.error("Failed to send reply");
         }
     };
 
@@ -231,6 +246,39 @@ const SupportTickets = () => {
                                         {selectedTicket.message}
                                     </p>
                                 </div>
+                            </div>
+
+                            {/* Admin Reply Area */}
+                            <div>
+                                <h4 className="flex items-center gap-2 font-bold text-slate-800 mb-2">
+                                    <CheckCircle size={18} className="text-emerald-500" />
+                                    Admin Reply
+                                </h4>
+                                {selectedTicket.adminReply ? (
+                                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                                        <p className="text-slate-700 whitespace-pre-wrap leading-relaxed text-sm">
+                                            {selectedTicket.adminReply}
+                                        </p>
+                                        <p className="text-xs text-emerald-600 mt-2 italic">
+                                            Replied on {selectedTicket.adminReplyDate ? format(new Date(selectedTicket.adminReplyDate), 'MMM dd, yyyy HH:mm') : 'N/A'}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-3">
+                                        <textarea
+                                            value={replyText}
+                                            onChange={(e) => setReplyText(e.target.value)}
+                                            placeholder="Write your reply to the user here..."
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 min-h-[100px]"
+                                        ></textarea>
+                                        <button
+                                            onClick={replyTicket}
+                                            className="self-end px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg text-sm transition-colors"
+                                        >
+                                            Send Reply & Resolve
+                                        </button>
+                                    </div>
+                                )}
                             </div>
 
                         </div>
