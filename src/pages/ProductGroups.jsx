@@ -115,7 +115,10 @@ const ProductGroups = () => {
             setGroupName(group.name);
             setCurrency(group.currency || 'USD');
             // Handle backward compatibility for single country field
-            const initialCountries = group.countries || (group.country ? [group.country] : []);
+            // Use countries if it has items, otherwise fallback to legacy country field
+            const initialCountries = (group.countries && group.countries.length > 0) 
+                ? group.countries 
+                : (group.country ? [group.country] : []);
             setSelectedCountries(initialCountries);
             setIsDefault(group.isDefault || false);
             setSelectedProducts(group.products.map(p => ({
@@ -160,6 +163,8 @@ const ProductGroups = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('Submitting Product Group. Selected Countries:', selectedCountries);
+        
         if (!groupName.trim()) return alert('Please enter group name');
         if (selectedProducts.length === 0) return alert('Please select at least one product');
 
@@ -193,6 +198,7 @@ const ProductGroups = () => {
             name: groupName,
             currency: currency,
             countries: selectedCountries,
+            country: '', // Clear legacy field on save/update
             isDefault: isDefault,
             products: selectedProducts.map(p => ({
                 productId: p.productId,
@@ -200,17 +206,19 @@ const ProductGroups = () => {
             }))
         };
 
+        console.log('Payload:', payload);
+
         try {
             if (editingGroup) {
                 await api.patch(`/product-groups/${editingGroup._id}`, payload);
             } else {
                 await api.post('/product-groups', payload);
             }
-            fetchGroups();
+            await fetchGroups();
             setIsModalOpen(false);
         } catch (err) {
-            console.error('Submit error:', err);
-            alert('Failed to save group');
+            console.error('Submit error:', err.response?.data || err);
+            alert(err.response?.data?.message || 'Failed to save group');
         }
     };
 
@@ -257,13 +265,17 @@ const ProductGroups = () => {
                                     <span>{group.products.length} Products</span>
                                     <span>•</span>
                                     <span className="text-blue-600 font-medium">{group.userCount || 0} Users</span>
-                                    {group.countries && group.countries.length > 0 && (
+                                    {(group.countries?.length > 0 || group.country) && (
                                         <>
                                             <span>•</span>
                                             <div className="flex flex-wrap gap-1">
-                                                {group.countries.map(c => (
-                                                    <span key={c} className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">{c}</span>
-                                                ))}
+                                                {group.countries?.length > 0 ? (
+                                                    group.countries.map(c => (
+                                                        <span key={c} className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">{c}</span>
+                                                    ))
+                                                ) : (
+                                                    <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">{group.country}</span>
+                                                )}
                                             </div>
                                         </>
                                     )}
