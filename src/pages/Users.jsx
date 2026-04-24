@@ -97,6 +97,23 @@ const Users = () => {
         }
     };
 
+    const getResolvedProductGroup = (user) => {
+        if (!user) return null;
+        
+        // Dynamically resolve for certified_shop
+        if (user.role === 'certified_shop') {
+            const countryGroup = productGroups.find(g => g.country && g.country === user.country);
+            if (countryGroup) return countryGroup;
+            const defaultGroup = productGroups.find(g => g.isDefault);
+            if (defaultGroup) return defaultGroup;
+        }
+
+        // For other roles or explicitly assigned
+        if (!user.productGroup) return null;
+        if (typeof user.productGroup === 'object') return user.productGroup;
+        return productGroups.find(g => g._id === user.productGroup) || { name: 'Linked', currency: '' };
+    };
+
     const fetchUsers = async () => {
         try {
             const res = await api.get('/users');
@@ -465,20 +482,21 @@ const Users = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        {user.productGroup ? (
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-bold text-slate-700">
-                                                    {typeof user.productGroup === 'object' ? user.productGroup.name :
-                                                        productGroups.find(g => g._id === user.productGroup)?.name || 'Linked'}
-                                                </span>
-                                                <span className="text-[10px] text-slate-400 uppercase tracking-wider">
-                                                    {typeof user.productGroup === 'object' ? user.productGroup.currency :
-                                                        productGroups.find(g => g._id === user.productGroup)?.currency}
-                                                </span>
-                                            </div>
-                                        ) : (
-                                            <span className="text-sm text-slate-300 italic">No Group</span>
-                                        )}
+                                        {(() => {
+                                            const resolvedGroup = getResolvedProductGroup(user);
+                                            return resolvedGroup ? (
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-bold text-slate-700">
+                                                        {resolvedGroup.name || 'Linked'}
+                                                    </span>
+                                                    <span className="text-[10px] text-slate-400 uppercase tracking-wider">
+                                                        {resolvedGroup.currency || ''}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-sm text-slate-300 italic">No Group</span>
+                                            );
+                                        })()}
                                     </td>
                                     <td className="px-6 py-4">
                                         {user.certificationVideoUrl ? (
