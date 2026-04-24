@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../api/axios';
+import { io } from 'socket.io-client';
 import { Search, Filter, MessageSquare, Mail, User, Tag, Clock, CheckCircle, X, Send } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
@@ -13,9 +14,32 @@ const SupportTickets = () => {
     const [replyText, setReplyText] = useState("");
     const [sending, setSending] = useState(false);
     const chatEndRef = useRef(null);
+    const selectedTicketRef = useRef(null);
+
+    // Keep ref in sync with state so socket handler can access latest value
+    useEffect(() => {
+        selectedTicketRef.current = selectedTicket;
+    }, [selectedTicket]);
 
     useEffect(() => {
         fetchTickets();
+    }, []);
+
+    // Real-time socket listener for support messages
+    useEffect(() => {
+        const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+        const socket = io(socketUrl, { transports: ['websocket', 'polling'] });
+
+        socket.on('support_message', ({ ticketId, ticket }) => {
+            // Update the ticket in the list
+            setTickets(prev => prev.map(t => t._id === ticketId ? ticket : t));
+            // Update selected ticket if it's the one being viewed
+            if (selectedTicketRef.current && selectedTicketRef.current._id === ticketId) {
+                setSelectedTicket(ticket);
+            }
+        });
+
+        return () => socket.disconnect();
     }, []);
 
     useEffect(() => {
