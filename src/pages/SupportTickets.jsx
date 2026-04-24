@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import api from '../api/axios';
-import { Search, Filter, MessageSquare, Mail, User, Tag, Clock, CheckCircle, X } from 'lucide-react';
+import { Search, Filter, MessageSquare, Mail, User, Tag, Clock, CheckCircle, X, Send } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
 
@@ -11,10 +11,18 @@ const SupportTickets = () => {
     const [statusFilter, setStatusFilter] = useState("all");
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [replyText, setReplyText] = useState("");
+    const [sending, setSending] = useState(false);
+    const chatEndRef = useRef(null);
 
     useEffect(() => {
         fetchTickets();
     }, []);
+
+    useEffect(() => {
+        if (chatEndRef.current) {
+            chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [selectedTicket?.messages]);
 
     const fetchTickets = async () => {
         try {
@@ -43,17 +51,30 @@ const SupportTickets = () => {
         }
     };
 
-    const replyTicket = async () => {
-        if (!replyText.trim()) return toast.error("Reply cannot be empty");
+    const sendMessage = async () => {
+        if (!replyText.trim() || sending) return;
+        setSending(true);
         try {
-            const res = await api.patch(`/support/${selectedTicket._id}`, { adminReply: replyText, status: 'resolved' });
+            const res = await api.post(`/support/${selectedTicket._id}/messages`, {
+                sender: 'admin',
+                content: replyText.trim(),
+            });
             setTickets(tickets.map(ticket => ticket._id === selectedTicket._id ? res.data : ticket));
             setSelectedTicket(res.data);
             setReplyText("");
-            toast.success("Reply sent and ticket resolved!");
+            toast.success("Message sent!");
         } catch (err) {
-            console.error("Failed to send reply:", err);
-            toast.error("Failed to send reply");
+            console.error("Failed to send message:", err);
+            toast.error("Failed to send message");
+        } finally {
+            setSending(false);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
         }
     };
 
@@ -84,6 +105,24 @@ const SupportTickets = () => {
 
         return matchesSearch && matchesStatus;
     });
+
+    // Build chat messages from ticket data (backward-compatible)
+    const getChatMessages = (ticket) => {
+        if (!ticket) return [];
+        // If ticket has messages array, use it
+        if (ticket.messages && ticket.messages.length > 0) {
+            return ticket.messages;
+        }
+        // Fallback: build from legacy fields
+        const msgs = [];
+        if (ticket.message) {
+            msgs.push({ sender: 'user', content: ticket.message, timestamp: ticket.createdAt });
+        }
+        if (ticket.adminReply) {
+            msgs.push({ sender: 'admin', content: ticket.adminReply, timestamp: ticket.adminReplyDate || ticket.updatedAt });
+        }
+        return msgs;
+    };
 
     return (
         <div className="space-y-6">
@@ -191,116 +230,89 @@ const SupportTickets = () => {
                 </div>
             </div>
 
-            {/* Ticket Detail Modal */}
+            {/* Ticket Chat Modal */}
             {selectedTicket && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4" onClick={() => setSelectedTicket(null)}>
                     <div
-                        className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                        className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col"
+                        style={{ height: '80vh' }}
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header */}
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                            <div>
-                                <h3 className="font-bold text-lg text-slate-900">Ticket Details</h3>
-                                <p className="text-xs text-slate-500">Submitted on {selectedTicket.createdAt ? format(new Date(selectedTicket.createdAt), 'MMM dd, yyyy HH:mm') : 'N/A'}</p>
-                            </div>
-                            <button
-                                onClick={() => setSelectedTicket(null)}
-                                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        {/* Modal Body */}
-                        <div className="p-6 overflow-y-auto flex-1 space-y-6">
-
-                            {/* User Info Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Customer Name</p>
-                                    <p className="font-medium text-slate-700 flex items-center gap-2"><User size={16} className="text-blue-500" /> {selectedTicket.name}</p>
-                                </div>
-                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Email Address</p>
-                                    <p className="font-medium text-slate-700 flex items-center gap-2"><Mail size={16} className="text-blue-500" /> {selectedTicket.email}</p>
-                                </div>
-                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">User Role</p>
-                                    <p className="font-medium text-slate-700 capitalize">{selectedTicket.userType}</p>
-                                </div>
-                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Issue Category</p>
-                                    <p className="font-medium text-slate-700 flex items-center gap-2"><Tag size={16} className="text-emerald-500" /> <span className="capitalize">{selectedTicket.issueCategory}</span></p>
-                                </div>
-                            </div>
-
-                            {/* Message Area */}
-                            <div>
-                                <h4 className="flex items-center gap-2 font-bold text-slate-800 mb-2">
-                                    <MessageSquare size={18} className="text-purple-500" />
-                                    Detailed Message
-                                </h4>
-                                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 min-h-[120px]">
-                                    <p className="text-slate-700 whitespace-pre-wrap leading-relaxed text-sm">
-                                        {selectedTicket.message}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Admin Reply Area */}
-                            <div>
-                                <h4 className="flex items-center gap-2 font-bold text-slate-800 mb-2">
-                                    <CheckCircle size={18} className="text-emerald-500" />
-                                    Admin Reply
-                                </h4>
-                                {selectedTicket.adminReply ? (
-                                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-                                        <p className="text-slate-700 whitespace-pre-wrap leading-relaxed text-sm">
-                                            {selectedTicket.adminReply}
-                                        </p>
-                                        <p className="text-xs text-emerald-600 mt-2 italic">
-                                            Replied on {selectedTicket.adminReplyDate ? format(new Date(selectedTicket.adminReplyDate), 'MMM dd, yyyy HH:mm') : 'N/A'}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col gap-3">
-                                        <textarea
-                                            value={replyText}
-                                            onChange={(e) => setReplyText(e.target.value)}
-                                            placeholder="Write your reply to the user here..."
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 min-h-[100px]"
-                                        ></textarea>
-                                        <button
-                                            onClick={replyTicket}
-                                            className="self-end px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg text-sm transition-colors"
-                                        >
-                                            Send Reply & Resolve
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-
-                        </div>
-
-                        {/* Modal Footer / Actions */}
-                        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-                            <span className="text-sm font-medium text-slate-600">Update Status:</span>
+                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
                             <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <User size={20} className="text-blue-600" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-slate-900">{selectedTicket.name}</h3>
+                                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                                        <span>{selectedTicket.email}</span>
+                                        <span>·</span>
+                                        <span className="capitalize">{selectedTicket.issueCategory}</span>
+                                        <span>·</span>
+                                        <StatusBadge status={selectedTicket.status} />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
                                 <select
                                     value={selectedTicket.status}
                                     onChange={(e) => updateTicketStatus(selectedTicket._id, e.target.value)}
-                                    className={`px-3 py-2 rounded-lg text-sm font-bold uppercase cursor-pointer outline-none border shadow-sm transition-all
-                                        ${selectedTicket.status === 'open' ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100' :
-                                            selectedTicket.status === 'in_progress' ? 'bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100' :
-                                                selectedTicket.status === 'resolved' ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100' :
-                                                    'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'}`}
+                                    className="px-2 py-1 rounded-lg text-xs font-semibold cursor-pointer outline-none border border-slate-200 bg-white"
                                 >
                                     <option value="open">Open</option>
                                     <option value="in_progress">In Progress</option>
                                     <option value="resolved">Resolved</option>
                                     <option value="closed">Closed</option>
                                 </select>
+                                <button
+                                    onClick={() => setSelectedTicket(null)}
+                                    className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Chat Messages Area */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/30">
+                            {getChatMessages(selectedTicket).map((msg, idx) => (
+                                <div key={idx} className={`flex ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
+                                    <div className={`max-w-[75%] rounded-2xl px-4 py-3 ${
+                                        msg.sender === 'admin'
+                                            ? 'bg-blue-600 text-white rounded-br-sm'
+                                            : 'bg-white border border-slate-200 text-slate-800 rounded-bl-sm shadow-sm'
+                                    }`}>
+                                        <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                                        <p className={`text-[10px] mt-1 ${msg.sender === 'admin' ? 'text-blue-200' : 'text-slate-400'}`}>
+                                            {msg.timestamp ? format(new Date(msg.timestamp), 'MMM dd, HH:mm') : ''}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                            <div ref={chatEndRef} />
+                        </div>
+
+                        {/* Message Input */}
+                        <div className="px-4 py-3 border-t border-slate-100 bg-white shrink-0">
+                            <div className="flex items-end gap-2">
+                                <textarea
+                                    value={replyText}
+                                    onChange={(e) => setReplyText(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder="Type your reply..."
+                                    rows={1}
+                                    className="flex-1 resize-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 max-h-[120px]"
+                                    style={{ minHeight: '44px' }}
+                                />
+                                <button
+                                    onClick={sendMessage}
+                                    disabled={!replyText.trim() || sending}
+                                    className="h-11 w-11 shrink-0 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <Send size={18} />
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -311,4 +323,3 @@ const SupportTickets = () => {
 };
 
 export default SupportTickets;
-
