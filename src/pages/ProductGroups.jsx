@@ -114,7 +114,9 @@ const ProductGroups = () => {
             setEditingGroup(group);
             setGroupName(group.name);
             setCurrency(group.currency || 'USD');
-            setSelectedCountries(group.countries || []);
+            // Handle backward compatibility for single country field
+            const initialCountries = group.countries || (group.country ? [group.country] : []);
+            setSelectedCountries(initialCountries);
             setIsDefault(group.isDefault || false);
             setSelectedProducts(group.products.map(p => ({
                 productId: p.productId._id || p.productId,
@@ -166,16 +168,24 @@ const ProductGroups = () => {
             const duplicates = [];
             groups.forEach(g => {
                 if (editingGroup && g._id === editingGroup._id) return;
+                
+                // Check new array field
                 g.countries?.forEach(c => {
                     if (selectedCountries.includes(c)) {
                         duplicates.push({ country: c, groupName: g.name });
                     }
                 });
+                
+                // Check old single field for compatibility
+                if (g.country && selectedCountries.includes(g.country)) {
+                    duplicates.push({ country: g.country, groupName: g.name });
+                }
             });
 
             if (duplicates.length > 0) {
-                const dupMsg = duplicates.map(d => `${d.country} (already in ${d.groupName})`).join(', ');
-                return alert(`Please remove the existing country from the group before creating a new one.\n\nDuplicates found: ${dupMsg}`);
+                // Deduplicate warnings
+                const uniqueDups = Array.from(new Set(duplicates.map(d => `${d.country} (already in ${d.groupName})`)));
+                return alert(`Please remove the existing country from the group before creating a new one.\n\nDuplicates found:\n- ${uniqueDups.join('\n- ')}`);
             }
         }
 
