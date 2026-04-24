@@ -102,7 +102,7 @@ const Users = () => {
         
         // Dynamically resolve for certified_shop
         if (user.role === 'certified_shop') {
-            const countryGroup = productGroups.find(g => g.country && g.country === user.country);
+            const countryGroup = productGroups.find(g => g.countries && g.countries.includes(user.country));
             if (countryGroup) return countryGroup;
             const defaultGroup = productGroups.find(g => g.isDefault);
             if (defaultGroup) return defaultGroup;

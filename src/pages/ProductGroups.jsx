@@ -11,7 +11,7 @@ const ProductGroups = () => {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [groupName, setGroupName] = useState('');
     const [currency, setCurrency] = useState('USD');
-    const [country, setCountry] = useState('');
+    const [selectedCountries, setSelectedCountries] = useState([]);
     const [isDefault, setIsDefault] = useState(false);
     const [searchProduct, setSearchProduct] = useState('');
 
@@ -114,7 +114,7 @@ const ProductGroups = () => {
             setEditingGroup(group);
             setGroupName(group.name);
             setCurrency(group.currency || 'USD');
-            setCountry(group.country || '');
+            setSelectedCountries(group.countries || []);
             setIsDefault(group.isDefault || false);
             setSelectedProducts(group.products.map(p => ({
                 productId: p.productId._id || p.productId,
@@ -125,7 +125,7 @@ const ProductGroups = () => {
             setEditingGroup(null);
             setGroupName('');
             setCurrency('USD');
-            setCountry('');
+            setSelectedCountries([]);
             setIsDefault(false);
             setSelectedProducts([]);
         }
@@ -161,10 +161,28 @@ const ProductGroups = () => {
         if (!groupName.trim()) return alert('Please enter group name');
         if (selectedProducts.length === 0) return alert('Please select at least one product');
 
+        // Frontend check for duplicate countries across other groups
+        if (selectedCountries.length > 0) {
+            const duplicates = [];
+            groups.forEach(g => {
+                if (editingGroup && g._id === editingGroup._id) return;
+                g.countries?.forEach(c => {
+                    if (selectedCountries.includes(c)) {
+                        duplicates.push({ country: c, groupName: g.name });
+                    }
+                });
+            });
+
+            if (duplicates.length > 0) {
+                const dupMsg = duplicates.map(d => `${d.country} (already in ${d.groupName})`).join(', ');
+                return alert(`Please remove the existing country from the group before creating a new one.\n\nDuplicates found: ${dupMsg}`);
+            }
+        }
+
         const payload = {
             name: groupName,
             currency: currency,
-            country: country.trim() || undefined,
+            countries: selectedCountries,
             isDefault: isDefault,
             products: selectedProducts.map(p => ({
                 productId: p.productId,
@@ -229,10 +247,14 @@ const ProductGroups = () => {
                                     <span>{group.products.length} Products</span>
                                     <span>•</span>
                                     <span className="text-blue-600 font-medium">{group.userCount || 0} Users</span>
-                                    {group.country && (
+                                    {group.countries && group.countries.length > 0 && (
                                         <>
                                             <span>•</span>
-                                            <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">{group.country}</span>
+                                            <div className="flex flex-wrap gap-1">
+                                                {group.countries.map(c => (
+                                                    <span key={c} className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">{c}</span>
+                                                ))}
+                                            </div>
                                         </>
                                     )}
                                     {group.isDefault && (
@@ -308,17 +330,33 @@ const ProductGroups = () => {
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-700">Country (Optional Target)</label>
+                                    <label className="text-sm font-bold text-slate-700">Countries (Multiple Selection)</label>
                                     <select
                                         className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all outline-none appearance-none"
-                                        value={country}
-                                        onChange={(e) => setCountry(e.target.value)}
+                                        value=""
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val && !selectedCountries.includes(val)) {
+                                                setSelectedCountries([...selectedCountries, val]);
+                                            }
+                                        }}
                                     >
-                                        <option value="">No specific country (Global)</option>
+                                        <option value="">Select a country to add...</option>
                                         {countriesList.map(c => (
-                                            <option key={c} value={c}>{c}</option>
+                                            <option key={c} value={c} disabled={selectedCountries.includes(c)}>{c}</option>
                                         ))}
                                     </select>
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {selectedCountries.map(c => (
+                                            <span key={c} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                                                {c}
+                                                <button type="button" onClick={() => setSelectedCountries(selectedCountries.filter(item => item !== c))}>
+                                                    <X size={12} />
+                                                </button>
+                                            </span>
+                                        ))}
+                                        {selectedCountries.length === 0 && <span className="text-xs text-slate-400 italic">No specific countries (Global)</span>}
+                                    </div>
                                 </div>
                                 <div className="space-y-2 flex items-center h-full pt-6">
                                     <label className="flex items-center gap-2 cursor-pointer">
