@@ -11,6 +11,8 @@ const ProductGroups = () => {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [groupName, setGroupName] = useState('');
     const [currency, setCurrency] = useState('USD');
+    const [country, setCountry] = useState('');
+    const [isDefault, setIsDefault] = useState(false);
     const [searchProduct, setSearchProduct] = useState('');
 
     const currencies = [
@@ -98,6 +100,8 @@ const ProductGroups = () => {
             setEditingGroup(group);
             setGroupName(group.name);
             setCurrency(group.currency || 'USD');
+            setCountry(group.country || '');
+            setIsDefault(group.isDefault || false);
             setSelectedProducts(group.products.map(p => ({
                 productId: p.productId._id || p.productId,
                 name: p.productId.name,
@@ -107,6 +111,8 @@ const ProductGroups = () => {
             setEditingGroup(null);
             setGroupName('');
             setCurrency('USD');
+            setCountry('');
+            setIsDefault(false);
             setSelectedProducts([]);
         }
         setIsModalOpen(true);
@@ -144,6 +150,8 @@ const ProductGroups = () => {
         const payload = {
             name: groupName,
             currency: currency,
+            country: country.trim() || undefined,
+            isDefault: isDefault,
             products: selectedProducts.map(p => ({
                 productId: p.productId,
                 sizes: p.sizes
@@ -203,10 +211,22 @@ const ProductGroups = () => {
                         <div className="p-6 flex justify-between items-center bg-slate-50/50">
                             <div>
                                 <h3 className="text-lg font-bold text-slate-900">{group.name}</h3>
-                                <div className="flex gap-2 text-sm text-slate-500">
+                                <div className="flex gap-2 text-sm text-slate-500 mt-1 items-center">
                                     <span>{group.products.length} Products</span>
                                     <span>•</span>
                                     <span className="text-blue-600 font-medium">{group.userCount || 0} Users</span>
+                                    {group.country && (
+                                        <>
+                                            <span>•</span>
+                                            <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">{group.country}</span>
+                                        </>
+                                    )}
+                                    {group.isDefault && (
+                                        <>
+                                            <span>•</span>
+                                            <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs font-bold">Default</span>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                             <div className="flex gap-2">
@@ -272,6 +292,27 @@ const ProductGroups = () => {
                                             <option key={c.code} value={c.code}>{c.code} - {c.name} ({c.symbol})</option>
                                         ))}
                                     </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-700">Country (Optional Target)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                        placeholder="e.g. United States"
+                                        value={country}
+                                        onChange={(e) => setCountry(e.target.value)}
+                                    />
+                                </div>
+                                <div className="space-y-2 flex items-center h-full pt-6">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                            checked={isDefault}
+                                            onChange={(e) => setIsDefault(e.target.checked)}
+                                        />
+                                        <span className="text-sm font-bold text-slate-700">Make this Default Group (Fallback)</span>
+                                    </label>
                                 </div>
                             </div>
 
