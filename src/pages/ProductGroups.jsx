@@ -67,6 +67,20 @@ const ProductGroups = () => {
         { code: 'LKR', symbol: 'Rs', name: 'Sri Lankan Rupee' },
     ].sort((a, b) => a.code.localeCompare(b.code));
 
+    const countriesList = [
+        "United States", "United Kingdom", "Canada", "Australia", "New Zealand",
+        "Pakistan", "India", "Bangladesh", "Sri Lanka", "Nepal", "Maldives",
+        "United Arab Emirates", "Saudi Arabia", "Qatar", "Kuwait", "Oman", "Bahrain",
+        "Germany", "France", "Italy", "Spain", "Netherlands", "Switzerland", "Sweden",
+        "Norway", "Denmark", "Finland", "Belgium", "Austria", "Ireland",
+        "Japan", "China", "South Korea", "Singapore", "Malaysia", "Indonesia",
+        "Thailand", "Vietnam", "Philippines", "Taiwan", "Hong Kong",
+        "Brazil", "Mexico", "Argentina", "Chile", "Colombia", "Peru",
+        "South Africa", "Egypt", "Nigeria", "Kenya", "Morocco", "Ghana",
+        "Turkey", "Russia", "Ukraine", "Poland", "Czech Republic", "Hungary",
+        "Israel", "Jordan", "Lebanon"
+    ].sort();
+
     const getSymbol = (code) => currencies.find(c => c.code === code)?.symbol || '$';
 
     useEffect(() => {
@@ -295,13 +309,16 @@ const ProductGroups = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-bold text-slate-700">Country (Optional Target)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
-                                        placeholder="e.g. United States"
+                                    <select
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all outline-none appearance-none"
                                         value={country}
                                         onChange={(e) => setCountry(e.target.value)}
-                                    />
+                                    >
+                                        <option value="">No specific country (Global)</option>
+                                        {countriesList.map(c => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="space-y-2 flex items-center h-full pt-6">
                                     <label className="flex items-center gap-2 cursor-pointer">
