@@ -99,19 +99,30 @@ const Users = () => {
 
     const getResolvedProductGroup = (user) => {
         if (!user) return null;
-        
-        // Dynamically resolve for certified_shop
-        if (user.role === 'certified_shop') {
-            const countryGroup = productGroups.find(g => g.countries && g.countries.includes(user.country));
-            if (countryGroup) return countryGroup;
-            const defaultGroup = productGroups.find(g => g.isDefault);
-            if (defaultGroup) return defaultGroup;
+
+        // 1. Explicitly assigned (populated object from backend)
+        if (user.productGroup) {
+            if (typeof user.productGroup === 'object' && user.productGroup.name) {
+                return user.productGroup;
+            }
+            // Raw string ID fallback
+            const groupId = user.productGroup.toString();
+            const found = productGroups.find(g => g._id?.toString() === groupId);
+            if (found) return found;
         }
 
-        // For other roles or explicitly assigned
-        if (!user.productGroup) return null;
-        if (typeof user.productGroup === 'object') return user.productGroup;
-        return productGroups.find(g => g._id === user.productGroup) || { name: 'Linked', currency: '' };
+        // 2. Display fallback: match by country (not saved to DB, only for display)
+        if (user.country && productGroups.length > 0) {
+            const countryMatch = productGroups.find(
+                g => (Array.isArray(g.countries) && g.countries.includes(user.country)) || g.country === user.country
+            );
+            if (countryMatch) return { ...countryMatch, _displayOnly: true };
+
+            const defaultGroup = productGroups.find(g => g.isDefault);
+            if (defaultGroup) return { ...defaultGroup, _displayOnly: true };
+        }
+
+        return null;
     };
 
     const fetchUsers = async () => {
@@ -433,7 +444,7 @@ const Users = () => {
                                 <th className="px-6 py-4 font-semibold">User</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "150px" }}>Partner ID</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Role</th>
-                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Pricing Group</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Product Pricing Group</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "100px" }}>Video</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "150px" }}>Courses</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Address</th>
@@ -490,11 +501,11 @@ const Users = () => {
                                                         {resolvedGroup.name || 'Linked'}
                                                     </span>
                                                     <span className="text-[10px] text-slate-400 uppercase tracking-wider">
-                                                        {resolvedGroup.currency || ''}
+                                                        {resolvedGroup._displayOnly ? '(auto)' : (resolvedGroup.currency || '')}
                                                     </span>
                                                 </div>
                                             ) : (
-                                                <span className="text-sm text-slate-300 italic">No Group</span>
+                                                <span className="text-sm text-slate-300 italic">None (Standard Pricing)</span>
                                             );
                                         })()}
                                     </td>
