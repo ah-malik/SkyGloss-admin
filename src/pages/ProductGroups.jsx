@@ -68,17 +68,7 @@ const ProductGroups = () => {
     ].sort((a, b) => a.code.localeCompare(b.code));
 
     const countriesList = [
-        "United States", "United Kingdom", "Canada", "Australia", "New Zealand",
-        "Pakistan", "India", "Bangladesh", "Sri Lanka", "Nepal", "Maldives",
-        "United Arab Emirates", "Saudi Arabia", "Qatar", "Kuwait", "Oman", "Bahrain",
-        "Germany", "France", "Italy", "Spain", "Netherlands", "Switzerland", "Sweden",
-        "Norway", "Denmark", "Finland", "Belgium", "Austria", "Ireland",
-        "Japan", "China", "South Korea", "Singapore", "Malaysia", "Indonesia",
-        "Thailand", "Vietnam", "Philippines", "Taiwan", "Hong Kong",
-        "Brazil", "Mexico", "Argentina", "Chile", "Colombia", "Peru",
-        "South Africa", "Egypt", "Nigeria", "Kenya", "Morocco", "Ghana",
-        "Turkey", "Russia", "Ukraine", "Poland", "Czech Republic", "Hungary",
-        "Israel", "Jordan", "Lebanon"
+        "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Congo-Brazzaville)", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia (Czech Republic)", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Holy See", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar (formerly Burma)", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
     ].sort();
 
     const getSymbol = (code) => currencies.find(c => c.code === code)?.symbol || '$';
@@ -116,8 +106,8 @@ const ProductGroups = () => {
             setCurrency(group.currency || 'USD');
             // Handle backward compatibility for single country field
             // Use countries if it has items, otherwise fallback to legacy country field
-            const initialCountries = (group.countries && group.countries.length > 0) 
-                ? group.countries 
+            const initialCountries = (group.countries && group.countries.length > 0)
+                ? group.countries
                 : (group.country ? [group.country] : []);
             setSelectedCountries(initialCountries);
             setIsDefault(group.isDefault || false);
@@ -164,7 +154,7 @@ const ProductGroups = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('Submitting Product Group. Selected Countries:', selectedCountries);
-        
+
         if (!groupName.trim()) return alert('Please enter group name');
         if (selectedProducts.length === 0) return alert('Please select at least one product');
 
@@ -173,14 +163,14 @@ const ProductGroups = () => {
             const duplicates = [];
             groups.forEach(g => {
                 if (editingGroup && g._id === editingGroup._id) return;
-                
+
                 // Check new array field
                 g.countries?.forEach(c => {
                     if (selectedCountries.includes(c)) {
                         duplicates.push({ country: c, groupName: g.name });
                     }
                 });
-                
+
                 // Check old single field for compatibility
                 if (g.country && selectedCountries.includes(g.country)) {
                     duplicates.push({ country: g.country, groupName: g.name });
@@ -380,7 +370,7 @@ const ProductGroups = () => {
                                         {selectedCountries.length === 0 && <span className="text-xs text-slate-400 italic">No specific countries (Global)</span>}
                                     </div>
                                 </div>
-                                <div className="space-y-2 flex items-center h-full pt-6">
+                                {/* <div className="space-y-2 flex items-center h-full pt-6">
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input
                                             type="checkbox"
@@ -390,7 +380,7 @@ const ProductGroups = () => {
                                         />
                                         <span className="text-sm font-bold text-slate-700">Make this Default Group (Fallback)</span>
                                     </label>
-                                </div>
+                                </div> */}
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">

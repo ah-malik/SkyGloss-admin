@@ -80,6 +80,7 @@ const Users = () => {
         youtube: '',
         tiktok: '',
         linkedin: '',
+        referredByPartnerCode: '',
         hearAboutUs: ''
     });
 
@@ -216,6 +217,7 @@ const Users = () => {
             youtube: user.youtube || '',
             tiktok: user.tiktok || '',
             linkedin: user.linkedin || '',
+            referredByPartnerCode: user.referredByPartnerCode || '',
             hearAboutUs: user.hearAboutUs || ''
         });
 
@@ -744,15 +746,37 @@ const Users = () => {
                                         maxLength={10}
                                         pattern="[a-zA-Z0-9]{4,10}"
                                         readOnly={false}
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 uppercase"
                                         placeholder="1234567890"
                                         value={formData.partnerCode}
                                         onChange={(e) => {
-                                            const val = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 10);
+                                            const val = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 10).toUpperCase();
                                             setFormData({ ...formData, partnerCode: val });
                                         }}
                                     />
                                     {!isEditMode && <p className="text-[10px] text-slate-400">Enter a unique 4-10 character code for this partner.</p>}
+                                </div>
+                            )}
+
+                            {/* Assigned Partner Field - For shops, allows admin to assign them to a partner */}
+                            {formData.role === 'certified_shop' && (
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">
+                                        Assigned To Partner (Partner Code)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        maxLength={10}
+                                        pattern="[a-zA-Z0-9]*"
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 uppercase"
+                                        placeholder="E.g. GLOBAL77"
+                                        value={formData.referredByPartnerCode}
+                                        onChange={(e) => {
+                                            const val = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 10).toUpperCase();
+                                            setFormData({ ...formData, referredByPartnerCode: val });
+                                        }}
+                                    />
+                                    <p className="text-[10px] text-slate-400">Enter the Partner Code of the partner who should manage this shop. Leave blank if none.</p>
                                 </div>
                             )}
 
