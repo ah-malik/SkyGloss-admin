@@ -762,21 +762,27 @@ const Users = () => {
                             {formData.role === 'certified_shop' && (
                                 <div className="space-y-2">
                                     <label className="text-sm font-semibold text-slate-700">
-                                        Assigned To Partner (Partner Code)
+                                        Assigned To Partner
                                     </label>
-                                    <input
-                                        type="text"
-                                        maxLength={10}
-                                        pattern="[a-zA-Z0-9]*"
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 uppercase"
-                                        placeholder="E.g. GLOBAL77"
+                                    <select
+                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                         value={formData.referredByPartnerCode}
                                         onChange={(e) => {
-                                            const val = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 10).toUpperCase();
-                                            setFormData({ ...formData, referredByPartnerCode: val });
+                                            setFormData({ ...formData, referredByPartnerCode: e.target.value });
                                         }}
-                                    />
-                                    <p className="text-[10px] text-slate-400">Enter the Partner Code of the partner who should manage this shop. Leave blank if none.</p>
+                                    >
+                                        <option value="">No Partner (None)</option>
+                                        <option value="GLOBAL77">Global Partner (GLOBAL77)</option>
+                                        {users
+                                            .filter(u => ['master_partner', 'regional_partner', 'partner'].includes(u.role) && u.partnerCode && u.partnerCode !== 'GLOBAL77')
+                                            .map(p => (
+                                                <option key={p.partnerCode} value={p.partnerCode}>
+                                                    {p.firstName} {p.lastName} ({p.partnerCode})
+                                                </option>
+                                            ))
+                                        }
+                                    </select>
+                                    <p className="text-[10px] text-slate-400">Select the partner who should manage this shop. Leave empty if none.</p>
                                 </div>
                             )}
 
