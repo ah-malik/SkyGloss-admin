@@ -156,15 +156,7 @@ const OrderDetails = () => {
                         <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100 space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">Subtotal</span>
-                                <span className="text-gray-900">${(order.totalAmount * 0.92 - 15).toFixed(2)} (Est)</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Shipping</span>
-                                <span className="text-gray-900">$15.00</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Tax</span>
-                                <span className="text-gray-900 font-medium">${(order.totalAmount * 0.08).toFixed(2)} (Est)</span>
+                                <span className="text-gray-900 font-medium">${order.totalAmount?.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-base pt-2 border-t border-gray-200">
                                 <span className="font-semibold text-gray-900">Total Paid</span>
