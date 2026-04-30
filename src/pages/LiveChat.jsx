@@ -26,7 +26,7 @@ const LiveChat = () => {
         fetchRooms();
 
         const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://skygloss-backend-production-3b96.up.railway.app';
-        const socket = io(socketUrl);
+        const socket = io(socketUrl, { transports: ['websocket'] });
         socketRef.current = socket;
 
         socket.on('connect', () => {
