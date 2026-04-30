@@ -23,7 +23,8 @@ const Products = () => {
         sizes: [{ size: '', price: '' }],
         status: 'published',
         targetAudience: 'all',
-        displayOrder: 0
+        displayOrder: 0,
+        technicalSheetUrl: ''
     });
 
     // Helper to convert legacy specs array to HTML string
@@ -77,7 +78,8 @@ const Products = () => {
                 sizes: product.sizes || [{ size: '', price: '' }],
                 status: product.status,
                 targetAudience: product.targetAudience || 'all',
-                displayOrder: product.displayOrder || 0
+                displayOrder: product.displayOrder || 0,
+                technicalSheetUrl: product.technicalSheetUrl || ''
             });
         } else {
             setEditingProduct(null);
@@ -94,7 +96,8 @@ const Products = () => {
                 sizes: [{ size: '', price: '' }],
                 status: 'published',
                 targetAudience: 'all',
-                displayOrder: 0
+                displayOrder: 0,
+                technicalSheetUrl: ''
             });
         }
         setIsModalOpen(true);
@@ -184,6 +187,31 @@ const Products = () => {
         } catch (err) {
             console.error(err);
             alert('Failed to upload images');
+        } finally {
+            setLoading(false);
+        }
+    };
+    const handleTDSUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const uploadFormData = new FormData();
+        uploadFormData.append('images', file); // The backend endpoint uses 'images' but handles 'auto' now
+
+        try {
+            setLoading(true);
+            const res = await api.post('/products/upload', uploadFormData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            const url = res.data.urls[0];
+            setFormData(prev => ({
+                ...prev,
+                technicalSheetUrl: url
+            }));
+            alert('TDS uploaded successfully');
+        } catch (err) {
+            console.error(err);
+            alert('Failed to upload TDS');
         } finally {
             setLoading(false);
         }
@@ -598,6 +626,35 @@ const Products = () => {
                                         )}
                                     </div>
                                 ))}
+                            </div>
+
+                             <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-sm font-semibold text-slate-700">Technical Data Sheet (TDS)</label>
+                                    <label className="text-blue-600 text-sm hover:underline flex items-center gap-1 cursor-pointer">
+                                        <Upload size={14} /> Upload PDF
+                                        <input
+                                            type="file"
+                                            accept=".pdf"
+                                            className="hidden"
+                                            onChange={handleTDSUpload}
+                                        />
+                                    </label>
+                                </div>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="TDS URL"
+                                        value={formData.technicalSheetUrl || ''}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, technicalSheetUrl: e.target.value }))}
+                                        className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm"
+                                    />
+                                    {formData.technicalSheetUrl && (
+                                        <a href={formData.technicalSheetUrl} target="_blank" rel="noreferrer" className="p-2 text-blue-600 bg-blue-50 rounded-lg">
+                                            <ExternalLink size={18} />
+                                        </a>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
