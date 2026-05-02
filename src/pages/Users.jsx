@@ -54,6 +54,8 @@ const Users = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('');
+    const [countryFilter, setCountryFilter] = useState('');
+    const [roleFilter, setRoleFilter] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [productGroups, setProductGroups] = useState([]);
     const [submitting, setSubmitting] = useState(false);
@@ -400,11 +402,17 @@ const Users = () => {
         }
     };
 
-    const filteredUsers = users.filter(user =>
-        user.email?.toLowerCase().includes(filter.toLowerCase()) ||
-        user.role?.toLowerCase().includes(filter.toLowerCase()) ||
-        (user.firstName + ' ' + user.lastName).toLowerCase().includes(filter.toLowerCase())
-    );
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = user.email?.toLowerCase().includes(filter.toLowerCase()) ||
+            user.role?.toLowerCase().includes(filter.toLowerCase()) ||
+            (user.firstName + ' ' + user.lastName).toLowerCase().includes(filter.toLowerCase()) ||
+            user.partnerCode?.toLowerCase().includes(filter.toLowerCase());
+        const matchesCountry = countryFilter ? user.country === countryFilter : true;
+        const matchesRole = roleFilter ? user.role === roleFilter : true;
+        return matchesSearch && matchesCountry && matchesRole;
+    });
+
+    const uniqueCountries = [...new Set(users.map(u => u.country).filter(Boolean))].sort();
 
     return (
         <div className="space-y-6">
@@ -422,21 +430,39 @@ const Users = () => {
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-4 border-b border-slate-100 flex gap-4">
-                    <div className="relative flex-1">
+                <div className="p-4 border-b border-slate-100 flex flex-wrap gap-4 items-center">
+                    <div className="relative flex-1 min-w-[250px]">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                         <input
                             type="text"
-                            placeholder="Search by name, email or role..."
+                            placeholder="Search by name, email, role or ID..."
                             className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
                         />
                     </div>
-                    <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600">
-                        <Filter size={18} />
-                        <span>Filter</span>
-                    </button>
+                    <select
+                        className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-600 min-w-[150px]"
+                        value={countryFilter}
+                        onChange={(e) => setCountryFilter(e.target.value)}
+                    >
+                        <option value="">All Countries</option>
+                        {uniqueCountries.map(country => (
+                            <option key={country} value={country}>{country}</option>
+                        ))}
+                    </select>
+                    <select
+                        className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-600 min-w-[150px]"
+                        value={roleFilter}
+                        onChange={(e) => setRoleFilter(e.target.value)}
+                    >
+                        <option value="">All Roles</option>
+                        <option value="master_partner">Master Partner</option>
+                        <option value="regional_partner">Regional Partner</option>
+                        <option value="partner">Partner</option>
+                        <option value="certified_shop">Certified Shop</option>
+                        <option value="admin">Administrator</option>
+                    </select>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -447,6 +473,7 @@ const Users = () => {
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "150px" }}>Partner ID</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Role</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Product Pricing Group</th>
+                                <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Assigned Partner</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "100px" }}>Video</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "150px" }}>Courses</th>
                                 <th className="px-6 py-4 font-semibold" style={{ minWidth: "200px" }}>Address</th>
@@ -510,6 +537,20 @@ const Users = () => {
                                                 <span className="text-sm text-slate-300 italic">None (Standard Pricing)</span>
                                             );
                                         })()}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {user.referredByPartnerCode ? (
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-slate-700">
+                                                    {user.referredByPartnerCode}
+                                                </span>
+                                                <span className="text-[10px] text-slate-400 uppercase tracking-wider">
+                                                    Code
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-sm text-slate-300 italic">None</span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4">
                                         {user.certificationVideoUrl ? (
