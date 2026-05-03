@@ -56,6 +56,7 @@ const Users = () => {
     const [filter, setFilter] = useState('');
     const [countryFilter, setCountryFilter] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [productGroups, setProductGroups] = useState([]);
     const [submitting, setSubmitting] = useState(false);
@@ -403,13 +404,28 @@ const Users = () => {
     };
 
     const filteredUsers = users.filter(user => {
+        const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
         const matchesSearch = user.email?.toLowerCase().includes(filter.toLowerCase()) ||
             user.role?.toLowerCase().includes(filter.toLowerCase()) ||
-            (user.firstName + ' ' + user.lastName).toLowerCase().includes(filter.toLowerCase()) ||
+            fullName.includes(filter.toLowerCase()) ||
+            user.city?.toLowerCase().includes(filter.toLowerCase()) ||
             user.partnerCode?.toLowerCase().includes(filter.toLowerCase());
+
         const matchesCountry = countryFilter ? user.country === countryFilter : true;
         const matchesRole = roleFilter ? user.role === roleFilter : true;
-        return matchesSearch && matchesCountry && matchesRole;
+
+        let matchesStatus = true;
+        if (statusFilter) {
+            if (statusFilter === 'certified') {
+                matchesStatus = user.isCertified === true;
+            } else if (statusFilter === 'pending_approval') {
+                matchesStatus = user.isTrainingComplete === true && !user.isCertified;
+            } else {
+                matchesStatus = user.status === statusFilter;
+            }
+        }
+
+        return matchesSearch && matchesCountry && matchesRole && matchesStatus;
     });
 
     const uniqueCountries = [...new Set(users.map(u => u.country).filter(Boolean))].sort();
@@ -462,6 +478,18 @@ const Users = () => {
                         <option value="partner">Partner</option>
                         <option value="certified_shop">Certified Shop</option>
                         <option value="admin">Administrator</option>
+                    </select>
+                    <select
+                        className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-600 min-w-[150px]"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="pending">Pending</option>
+                        <option value="blocked">Blocked</option>
+                        <option value="certified">Certified</option>
+                        <option value="pending_approval">Pending Approval</option>
                     </select>
                 </div>
 
@@ -539,16 +567,19 @@ const Users = () => {
                                         })()}
                                     </td>
                                     <td className="px-6 py-4">
-                                        {user.referredByPartnerCode ? (
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-bold text-slate-700">
-                                                    {user.referredByPartnerCode}
-                                                </span>
-                                                <span className="text-[10px] text-slate-400 uppercase tracking-wider">
-                                                    Code
-                                                </span>
-                                            </div>
-                                        ) : (
+                                        {user.referredByPartnerCode ? (() => {
+                                            const partner = users.find(u => u.partnerCode === user.referredByPartnerCode);
+                                            return (
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-bold text-slate-700">
+                                                        {partner ? `${partner.firstName} ${partner.lastName}` : 'System / Link'}
+                                                    </span>
+                                                    <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">
+                                                        {user.referredByPartnerCode}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })() : (
                                             <span className="text-sm text-slate-300 italic">None</span>
                                         )}
                                     </td>
@@ -624,8 +655,17 @@ const Users = () => {
                                                             'bg-red-500'
                                                 }`} />
                                             {user.isCertified ? 'SkyGloss Certified' :
-                                                user.isTrainingComplete ? 'Pending Approval' :
-                                                    user.status === 'active' ? 'Active' : user.status}
+                                                user.isTrainingComplete ? 'Pending Certification' :
+                                                    user.status === 'active' ? 'Active' : (
+                                                        <div className="flex flex-col">
+                                                            <span className="capitalize">{user.status}</span>
+                                                            {user.status === 'blocked' && user.blockedBy && (
+                                                                <span className="text-[10px] text-slate-400">
+                                                                    By {typeof user.blockedBy === 'object' ? `${user.blockedBy.firstName} (${user.blockedBy.role})` : 'Partner/Admin'}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
@@ -965,34 +1005,34 @@ const Users = () => {
                                     </select>
                                 </div>
 
-                                                {/* Payment & Status Section */}
-                            {!['master_partner', 'regional_partner', 'partner'].includes(formData.role) && (
-                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <label className="text-sm font-semibold text-slate-700">Payment Status</label>
-                                            <div className="group relative">
-                                                <Info size={14} className="text-slate-400" />
-                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                                                    Manually marking a user as PAID will also set their status to CERTIFIED.
+                                {/* Payment & Status Section */}
+                                {!['master_partner', 'regional_partner', 'partner'].includes(formData.role) && (
+                                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <label className="text-sm font-semibold text-slate-700">Payment Status</label>
+                                                <div className="group relative">
+                                                    <Info size={14} className="text-slate-400" />
+                                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                                        Manually marking a user as PAID will also set their status to CERTIFIED.
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="sr-only peer"
+                                                    checked={formData.isPartnerPaid}
+                                                    onChange={(e) => setFormData({ ...formData, isPartnerPaid: e.target.checked })}
+                                                />
+                                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                                <span className={`ml-3 text-xs font-bold uppercase transition-colors ${formData.isPartnerPaid ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                                    {formData.isPartnerPaid ? 'Paid' : 'Unpaid'}
+                                                </span>
+                                            </label>
                                         </div>
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                className="sr-only peer"
-                                                checked={formData.isPartnerPaid}
-                                                onChange={(e) => setFormData({ ...formData, isPartnerPaid: e.target.checked })}
-                                            />
-                                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                                            <span className={`ml-3 text-xs font-bold uppercase transition-colors ${formData.isPartnerPaid ? 'text-emerald-600' : 'text-slate-400'}`}>
-                                                {formData.isPartnerPaid ? 'Paid' : 'Unpaid'}
-                                            </span>
-                                        </label>
                                     </div>
-                                </div>
-                            )}            </div>
+                                )}            </div>
 
                             {/* Online Presence & Socials */}
                             <div className="space-y-4 pt-4 border-t border-slate-100">

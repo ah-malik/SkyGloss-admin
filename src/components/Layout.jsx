@@ -11,7 +11,9 @@ import {
     UserCircle,
     ShieldCheck,
     Package,
-    MessageSquare
+    MessageSquare,
+    CreditCard,
+    GraduationCap
 } from 'lucide-react';
 import { useState } from 'react';
 import NotificationsBell from './NotificationsBell';
@@ -27,8 +29,10 @@ const Layout = ({ children }) => {
         { name: 'User Management', icon: Users, path: '/users' },
         { name: 'Product Management', icon: Package, path: '/products', roles: ['admin'] },
         { name: 'Pricing Groups', icon: ShieldCheck, path: '/product-groups', roles: ['admin'] },
+        { name: 'Registration Fees', icon: CreditCard, path: '/registration-fees', roles: ['admin'] },
         { name: 'Shop Requests', icon: Store, path: '/shop-requests', roles: ['admin'] },
         { name: 'Certification Requests', icon: ShieldCheck, path: '/certification-requests', roles: ['admin'] },
+        { name: 'Certification Status', icon: GraduationCap, path: '/certification-status', roles: ['admin'] },
         { name: 'Order Management', icon: Package, path: '/orders', roles: ['admin'] },
         { name: 'Support Tickets', icon: Store, path: '/support-tickets', roles: ['admin'] },
         { name: 'Live Chat', icon: MessageSquare, path: '/live-chat', roles: ['admin'] },
