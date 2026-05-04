@@ -80,14 +80,14 @@ const CertificationStatus = () => {
     };
 
     const filteredSummary = summary.filter(item => {
-        const matchesSearch = 
+        const matchesSearch =
             (item.shopName?.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (item.firstName?.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (item.lastName?.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (item.email?.toLowerCase().includes(searchQuery.toLowerCase()));
-        
+
         const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
-        
+
         return matchesSearch && matchesStatus;
     });
 
@@ -116,7 +116,7 @@ const CertificationStatus = () => {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Certification Status Dashboard</h1>
+                    <h1 className="text-2xl font-bold text-slate-900">Certification Issued Dashboard</h1>
                     <p className="text-slate-500 mt-1">Track training progress and certification requests across all shops</p>
                 </div>
                 <div className="flex gap-3">
@@ -127,13 +127,13 @@ const CertificationStatus = () => {
                         <Mail size={18} className="text-blue-600" />
                         Email Report
                     </button>
-                    <button
+                    {/* <button
                         onClick={handleExportExcel}
                         className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
                     >
                         <Download size={18} />
                         Export Excel
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
@@ -254,7 +254,7 @@ const CertificationStatus = () => {
                             </div>
                             <h2 className="text-xl font-bold text-slate-900 text-center mb-2">Email Status Report</h2>
                             <p className="text-slate-500 text-center text-sm mb-8">Enter an email address to receive the full certification status report in Excel format.</p>
-                            
+
                             <div className="space-y-4">
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-slate-500 uppercase ml-1">Recipient Email</label>

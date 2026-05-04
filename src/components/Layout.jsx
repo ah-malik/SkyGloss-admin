@@ -32,7 +32,7 @@ const Layout = ({ children }) => {
         { name: 'Registration Fees', icon: CreditCard, path: '/registration-fees', roles: ['admin'] },
         { name: 'Shop Requests', icon: Store, path: '/shop-requests', roles: ['admin'] },
         { name: 'Certification Requests', icon: ShieldCheck, path: '/certification-requests', roles: ['admin'] },
-        { name: 'Certification Status', icon: GraduationCap, path: '/certification-status', roles: ['admin'] },
+        { name: 'Certification Issued', icon: GraduationCap, path: '/certification-status', roles: ['admin'] },
         { name: 'Order Management', icon: Package, path: '/orders', roles: ['admin'] },
         { name: 'Support Tickets', icon: Store, path: '/support-tickets', roles: ['admin'] },
         { name: 'Live Chat', icon: MessageSquare, path: '/live-chat', roles: ['admin'] },

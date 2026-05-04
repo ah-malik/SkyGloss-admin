@@ -632,12 +632,13 @@ const Users = () => {
                                                     {!user.isSelfRegistered && (
                                                         <span className="opacity-40 text-[8px] italic ml-1">(Admin Created)</span>
                                                     )}
+                                                    {(user.couponCode || (user.isSelfRegistered && user.isPartnerPaid && !user.stripeSessionId)) && (
+                                                        <span className="text-[#2c2c2c] text-[8px] italic ml-1">
+                                                            coupon used
+                                                        </span>
+                                                    )}
                                                 </button>
-                                                {(user.couponCode || (user.isSelfRegistered && user.isPartnerPaid && !user.stripeSessionId)) && (
-                                                    <span className="text-[10px] font-medium text-slate-400 italic lowercase ml-1">
-                                                        registered with coupon code
-                                                    </span>
-                                                )}
+
                                             </div>
                                         ) : (
                                             <span className="text-slate-300">-</span>
