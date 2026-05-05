@@ -51,6 +51,18 @@ const Orders = () => {
         }
     };
 
+    const getCurrencySymbol = (currency) => {
+        const symbols = {
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'AUD': '$',
+            'CAD': '$',
+            'INR': '₹'
+        };
+        return symbols[currency?.toUpperCase()] || (currency ? (currency + ' ') : '$');
+    };
+
     const filteredOrders = orders.filter(order => {
         const matchesSearch =
             order._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -185,7 +197,7 @@ const Orders = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center text-sm font-medium text-gray-900">
-                                                <DollarSign className="w-4 h-4 text-gray-400" />
+                                                <span className="text-gray-400 mr-1">{getCurrencySymbol(order.currency)}</span>
                                                 {order.totalAmount?.toFixed(2)}
                                             </div>
                                         </td>

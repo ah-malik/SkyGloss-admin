@@ -681,22 +681,21 @@ const Users = () => {
                                                     <Trophy size={18} fill={user.isCertified ? "currentColor" : "none"} />
                                                 </button>
                                             )}
-                                            {user.status !== 'active' && (
+                                            {user.status === 'active' ? (
+                                                <button
+                                                    onClick={() => handleStatusChange(user._id, user.role, 'blocked')}
+                                                    className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg"
+                                                    title="Block User"
+                                                >
+                                                    <Ban size={18} />
+                                                </button>
+                                            ) : (
                                                 <button
                                                     onClick={() => handleStatusChange(user._id, user.role, 'active')}
                                                     className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg"
                                                     title="Activate User"
                                                 >
                                                     <CheckCircle size={18} />
-                                                </button>
-                                            )}
-                                            {user.status !== 'blocked' && (
-                                                <button
-                                                    onClick={() => handleStatusChange(user._id, user.role, 'blocked')}
-                                                    className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg"
-                                                    title="Block"
-                                                >
-                                                    <Ban size={18} />
                                                 </button>
                                             )}
                                             <button

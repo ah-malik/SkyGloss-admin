@@ -59,6 +59,18 @@ const OrderDetails = () => {
         }
     };
 
+    const getCurrencySymbol = (currency) => {
+        const symbols = {
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'AUD': '$',
+            'CAD': '$',
+            'INR': '₹'
+        };
+        return symbols[currency?.toUpperCase()] || (currency ? (currency + ' ') : '$');
+    };
+
     const handleDownloadPDF = async () => {
         try {
             const response = await api.get(`/pdf/order/${id}`, {
@@ -147,8 +159,8 @@ const OrderDetails = () => {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-medium text-gray-900">${(item.price * item.quantity).toFixed(2)}</p>
-                                        <p className="text-sm text-gray-500">${item.price} each</p>
+                                        <p className="font-medium text-gray-900">{getCurrencySymbol(order.currency)}{(item.price * item.quantity).toFixed(2)}</p>
+                                        <p className="text-sm text-gray-500">{getCurrencySymbol(order.currency)}{item.price} each</p>
                                     </div>
                                 </div>
                             ))}
@@ -156,11 +168,11 @@ const OrderDetails = () => {
                         <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100 space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">Subtotal</span>
-                                <span className="text-gray-900 font-medium">${order.totalAmount?.toFixed(2)}</span>
+                                <span className="text-gray-900 font-medium">{getCurrencySymbol(order.currency)}{order.totalAmount?.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-base pt-2 border-t border-gray-200">
                                 <span className="font-semibold text-gray-900">Total Paid</span>
-                                <span className="font-bold text-primary text-lg">${order.totalAmount?.toFixed(2)}</span>
+                                <span className="font-bold text-primary text-lg">{getCurrencySymbol(order.currency)}{order.totalAmount?.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
