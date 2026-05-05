@@ -80,15 +80,16 @@ const CertificationStatus = () => {
     };
 
     const filteredSummary = summary.filter(item => {
+        // Only show Approved shops
+        if (item.status !== 'Approved') return false;
+
         const matchesSearch =
             (item.shopName?.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (item.firstName?.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (item.lastName?.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (item.email?.toLowerCase().includes(searchQuery.toLowerCase()));
 
-        const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
-
-        return matchesSearch && matchesStatus;
+        return matchesSearch;
     });
 
     const getStatusStyle = (status) => {
@@ -117,7 +118,7 @@ const CertificationStatus = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900">Certification Issued Dashboard</h1>
-                    <p className="text-slate-500 mt-1">Track training progress and certification requests across all shops</p>
+                    <p className="text-slate-500 mt-1">All approved and certified shop users</p>
                 </div>
                 <div className="flex gap-3">
                     <button
@@ -138,7 +139,7 @@ const CertificationStatus = () => {
             </div>
 
             {/* Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                     <input
@@ -149,22 +150,8 @@ const CertificationStatus = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-                <div className="relative">
-                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                    <select
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none text-sm appearance-none"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                    >
-                        <option value="all">All Statuses</option>
-                        <option value="Approved">Approved</option>
-                        <option value="Applied">Applied</option>
-                        <option value="Course Complete (Not Applied)">Course Complete</option>
-                        <option value="Training in Progress">Training in Progress</option>
-                    </select>
-                </div>
                 <div className="flex items-center justify-end px-2 text-sm text-slate-500 font-medium">
-                    Showing {filteredSummary.length} of {summary.length} shops
+                    Showing {filteredSummary.length} certified shops
                 </div>
             </div>
 
