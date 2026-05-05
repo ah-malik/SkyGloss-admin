@@ -68,6 +68,7 @@ const Users = () => {
         email: '',
         firstName: '',
         lastName: '',
+        shopName: '',
         role: 'master_partner',
         password: '',
         phoneNumber: '',
@@ -202,6 +203,7 @@ const Users = () => {
             email: user.email || '',
             firstName: user.firstName || '',
             lastName: user.lastName || '',
+            shopName: user.shopName || '',
             role: user.role || 'master_partner',
             password: '', // Leave blank for edit
             phoneNumber: user.phoneNumber || '',
@@ -255,6 +257,7 @@ const Users = () => {
             email: '',
             firstName: '',
             lastName: '',
+            shopName: '',
             role: 'certified_shop',
             password: '',
             phoneNumber: '',
@@ -760,6 +763,22 @@ const Users = () => {
                                         value={formData.lastName}
                                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                     />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-slate-700">Shop / Store Name <span className="text-xs text-slate-400">(max 30 characters)</span></label>
+                                <input
+                                    type="text"
+                                    maxLength={30}
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                    placeholder="e.g. Car Care Melbourne"
+                                    value={formData.shopName}
+                                    onChange={(e) => { if (e.target.value.length <= 30) setFormData({ ...formData, shopName: e.target.value }); }}
+                                />
+                                <div className="flex justify-between items-center">
+                                    <p className="text-[10px] text-slate-400">This name appears on the certificate and network map.</p>
+                                    <p className={`text-[10px] ${(formData.shopName?.length || 0) >= 30 ? 'text-red-500 font-medium' : 'text-slate-400'}`}>{formData.shopName?.length || 0}/30</p>
                                 </div>
                             </div>
 
