@@ -10,6 +10,7 @@ const RegistrationFees = () => {
     const [editingGroup, setEditingGroup] = useState(null);
     const [groupName, setGroupName] = useState('');
     const [feeAmount, setFeeAmount] = useState(250);
+    const [taxAmount, setTaxAmount] = useState(0);
     const [currency, setCurrency] = useState('USD');
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [isDefault, setIsDefault] = useState(false);
@@ -194,6 +195,7 @@ const RegistrationFees = () => {
             setEditingGroup(group);
             setGroupName(group.name);
             setFeeAmount(group.feeAmount);
+            setTaxAmount(group.taxAmount || 0);
             setCurrency(group.currency || 'USD');
             setSelectedCountries(group.countries || []);
             setIsDefault(group.isDefault || false);
@@ -201,6 +203,7 @@ const RegistrationFees = () => {
             setEditingGroup(null);
             setGroupName('');
             setFeeAmount(250);
+            setTaxAmount(0);
             setCurrency('USD');
             setSelectedCountries([]);
             setIsDefault(false);
@@ -216,6 +219,7 @@ const RegistrationFees = () => {
         const payload = {
             name: groupName,
             feeAmount: parseFloat(feeAmount),
+            taxAmount: parseFloat(taxAmount || 0),
             currency: currency,
             countries: selectedCountries,
             isDefault: isDefault,
@@ -290,6 +294,11 @@ const RegistrationFees = () => {
                                             {getSymbol(group.currency)}{group.feeAmount}
                                             <span className="text-sm font-normal text-slate-400 ml-1 uppercase">{group.currency}</span>
                                             <span className="block text-[10px] text-slate-400 font-medium">{currencies.find(c => c.code === group.currency)?.name}</span>
+                                            {group.taxAmount > 0 && (
+                                                <span className="block text-xs font-bold text-amber-600 mt-1">
+                                                    +{getSymbol(group.currency)}{group.taxAmount} Tax
+                                                </span>
+                                            )}
                                         </p>
                                     </div>
                                     <div className="flex gap-1">
@@ -360,6 +369,21 @@ const RegistrationFees = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-700">Tax Amount</label>
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{getSymbol(currency)}</span>
+                                        <input
+                                            type="number"
+                                            required
+                                            min="0"
+                                            step="0.01"
+                                            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all outline-none font-bold text-amber-600"
+                                            value={taxAmount}
+                                            onChange={(e) => setTaxAmount(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-span-2 space-y-2">
                                     <label className="text-sm font-bold text-slate-700">Currency</label>
                                     <select
                                         className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all outline-none appearance-none"
