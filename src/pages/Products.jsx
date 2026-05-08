@@ -24,7 +24,9 @@ const Products = () => {
         status: 'published',
         targetAudience: 'all',
         displayOrder: 0,
-        technicalSheetUrl: ''
+        technicalSheetUrl: '',
+        sdsUrl: '',
+        applicationGuideUrl: ''
     });
 
     // Helper to convert legacy specs array to HTML string
@@ -79,7 +81,9 @@ const Products = () => {
                 status: product.status,
                 targetAudience: product.targetAudience || 'all',
                 displayOrder: product.displayOrder || 0,
-                technicalSheetUrl: product.technicalSheetUrl || ''
+                technicalSheetUrl: product.technicalSheetUrl || '',
+                sdsUrl: product.sdsUrl || '',
+                applicationGuideUrl: product.applicationGuideUrl || ''
             });
         } else {
             setEditingProduct(null);
@@ -97,7 +101,9 @@ const Products = () => {
                 status: 'published',
                 targetAudience: 'all',
                 displayOrder: 0,
-                technicalSheetUrl: ''
+                technicalSheetUrl: '',
+                sdsUrl: '',
+                applicationGuideUrl: ''
             });
         }
         setIsModalOpen(true);
@@ -146,6 +152,8 @@ const Products = () => {
 
 
 
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('[Products] Submitting formData:', formData);
@@ -191,12 +199,12 @@ const Products = () => {
             setLoading(false);
         }
     };
-    const handleTDSUpload = async (e) => {
+    const handleDocumentUpload = async (e, field) => {
         const file = e.target.files[0];
         if (!file) return;
 
         const uploadFormData = new FormData();
-        uploadFormData.append('images', file); // The backend endpoint uses 'images' but handles 'auto' now
+        uploadFormData.append('images', file);
 
         try {
             setLoading(true);
@@ -204,14 +212,11 @@ const Products = () => {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             const url = res.data.urls[0];
-            setFormData(prev => ({
-                ...prev,
-                technicalSheetUrl: url
-            }));
-            alert('TDS uploaded successfully');
+            setFormData(prev => ({ ...prev, [field]: url }));
+            alert('File uploaded successfully');
         } catch (err) {
             console.error(err);
-            alert('Failed to upload TDS');
+            alert('Failed to upload file');
         } finally {
             setLoading(false);
         }
@@ -628,32 +633,82 @@ const Products = () => {
                                 ))}
                             </div>
 
-                             <div className="space-y-3">
-                                <div className="flex justify-between items-center">
-                                    <label className="text-sm font-semibold text-slate-700">Technical Data Sheet (TDS)</label>
-                                    <label className="text-blue-600 text-sm hover:underline flex items-center gap-1 cursor-pointer">
-                                        <Upload size={14} /> Upload PDF
+                             <div className="space-y-4 border p-4 rounded-xl bg-slate-50 border-slate-200">
+                                <label className="text-sm font-bold text-slate-700 block mb-2">Downloads & Documentation</label>
+                                
+                                {/* SDS */}
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-sm font-semibold text-slate-600">Safety Data Sheet (SDS)</label>
+                                        <label className="text-blue-600 text-sm hover:underline flex items-center gap-1 cursor-pointer">
+                                            <Upload size={14} /> Upload PDF
+                                            <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleDocumentUpload(e, 'sdsUrl')} />
+                                        </label>
+                                    </div>
+                                    <div className="flex gap-2">
                                         <input
-                                            type="file"
-                                            accept=".pdf"
-                                            className="hidden"
-                                            onChange={handleTDSUpload}
+                                            type="text"
+                                            placeholder="SDS URL"
+                                            value={formData.sdsUrl || ''}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, sdsUrl: e.target.value }))}
+                                            className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm"
                                         />
-                                    </label>
+                                        {formData.sdsUrl && (
+                                            <a href={formData.sdsUrl} target="_blank" rel="noreferrer" className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100">
+                                                <ExternalLink size={18} />
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        placeholder="TDS URL"
-                                        value={formData.technicalSheetUrl || ''}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, technicalSheetUrl: e.target.value }))}
-                                        className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm"
-                                    />
-                                    {formData.technicalSheetUrl && (
-                                        <a href={formData.technicalSheetUrl} target="_blank" rel="noreferrer" className="p-2 text-blue-600 bg-blue-50 rounded-lg">
-                                            <ExternalLink size={18} />
-                                        </a>
-                                    )}
+
+                                {/* TDS */}
+                                <div className="space-y-2 pt-2 border-t border-slate-200">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-sm font-semibold text-slate-600">Technical Data Sheet (TDS)</label>
+                                        <label className="text-blue-600 text-sm hover:underline flex items-center gap-1 cursor-pointer">
+                                            <Upload size={14} /> Upload PDF
+                                            <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleDocumentUpload(e, 'technicalSheetUrl')} />
+                                        </label>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="TDS URL"
+                                            value={formData.technicalSheetUrl || ''}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, technicalSheetUrl: e.target.value }))}
+                                            className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm"
+                                        />
+                                        {formData.technicalSheetUrl && (
+                                            <a href={formData.technicalSheetUrl} target="_blank" rel="noreferrer" className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100">
+                                                <ExternalLink size={18} />
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Application Guide */}
+                                <div className="space-y-2 pt-2 border-t border-slate-200">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-sm font-semibold text-slate-600">Application Guide (PDF)</label>
+                                        <label className="text-blue-600 text-sm hover:underline flex items-center gap-1 cursor-pointer">
+                                            <Upload size={14} /> Upload PDF
+                                            <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleDocumentUpload(e, 'applicationGuideUrl')} />
+                                        </label>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Application Guide URL"
+                                            value={formData.applicationGuideUrl || ''}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, applicationGuideUrl: e.target.value }))}
+                                            className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm"
+                                        />
+                                        {formData.applicationGuideUrl && (
+                                            <a href={formData.applicationGuideUrl} target="_blank" rel="noreferrer" className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100">
+                                                <ExternalLink size={18} />
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
