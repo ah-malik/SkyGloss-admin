@@ -3,6 +3,8 @@ import api from '../api/axios';
 import { Country, State, City } from 'country-state-city';
 import { Search, Filter, MoreVertical, Trash2, Ban, CheckCircle, X, Loader2, Edit, Trophy, Video, Globe, Facebook, Instagram, Youtube, Linkedin, Info } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 
 const normalizeUrl = (url) => {
     if (!url || url.trim() === '') return '';
@@ -824,13 +826,13 @@ const Users = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-semibold text-slate-700">Phone Number</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                        placeholder="+1 (234) 567-890"
-                                        value={formData.phoneNumber}
-                                        onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                                    />
+                                    <div className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus-within:ring-2 focus-within:ring-blue-500/20">
+                                        <PhoneInput
+                                            placeholder="+1 (234) 567-890"
+                                            value={formData.phoneNumber}
+                                            onChange={(val) => setFormData({ ...formData, phoneNumber: val || '' })}
+                                        />
+                                    </div>
                                 </div>
                             </div>
 

@@ -10,3 +10,27 @@
 body {
   @apply bg-slate-50 text-slate-900;
 }
+
+.PhoneInput {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.PhoneInputInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding-left: 0.5rem;
+}
+.PhoneInputCountry {
+  display: flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+.PhoneInputCountrySelectArrow {
+  margin-left: 0.25rem;
+  width: 0.4em;
+  height: 0.4em;
+}

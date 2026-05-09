@@ -26,6 +26,7 @@ const Products = () => {
         displayOrder: 0,
         technicalSheetUrl: '',
         sdsUrl: '',
+        sdsUrlDutch: '',
         applicationGuideUrl: ''
     });
 
@@ -83,6 +84,7 @@ const Products = () => {
                 displayOrder: product.displayOrder || 0,
                 technicalSheetUrl: product.technicalSheetUrl || '',
                 sdsUrl: product.sdsUrl || '',
+                sdsUrlDutch: product.sdsUrlDutch || '',
                 applicationGuideUrl: product.applicationGuideUrl || ''
             });
         } else {
@@ -103,6 +105,7 @@ const Products = () => {
                 displayOrder: 0,
                 technicalSheetUrl: '',
                 sdsUrl: '',
+                sdsUrlDutch: '',
                 applicationGuideUrl: ''
             });
         }
@@ -655,6 +658,31 @@ const Products = () => {
                                         />
                                         {formData.sdsUrl && (
                                             <a href={formData.sdsUrl} target="_blank" rel="noreferrer" className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100">
+                                                <ExternalLink size={18} />
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* SDS Dutch */}
+                                <div className="space-y-2 pt-2 border-t border-slate-200">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-sm font-semibold text-slate-600">Safety Data Sheet (SDS) - Dutch</label>
+                                        <label className="text-blue-600 text-sm hover:underline flex items-center gap-1 cursor-pointer">
+                                            <Upload size={14} /> Upload PDF
+                                            <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleDocumentUpload(e, 'sdsUrlDutch')} />
+                                        </label>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="SDS Dutch URL"
+                                            value={formData.sdsUrlDutch || ''}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, sdsUrlDutch: e.target.value }))}
+                                            className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm"
+                                        />
+                                        {formData.sdsUrlDutch && (
+                                            <a href={formData.sdsUrlDutch} target="_blank" rel="noreferrer" className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100">
                                                 <ExternalLink size={18} />
                                             </a>
                                         )}
