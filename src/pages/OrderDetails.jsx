@@ -200,7 +200,7 @@ const OrderDetails = () => {
                                 className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <span className="flex items-center gap-2">
-                                    <Box className="w-4 h-4" /> Mark as Delivered
+                                    <Box className="w-4 h-4" /> Mark as Complete
                                 </span>
                                 {order.status === 'DELIVERED' && <CheckCircle className="w-4 h-4" />}
                             </button>
