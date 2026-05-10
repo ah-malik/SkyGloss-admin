@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
     ArrowLeft,
     MapPin,
@@ -13,7 +13,9 @@ import {
     XCircle,
     Truck,
     Box,
-    FileText
+    FileText,
+    Trash2,
+    DollarSign
 } from "lucide-react";
 import api from "../api/axios";
 import { format } from "date-fns";
@@ -24,6 +26,8 @@ const OrderDetails = () => {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [trackingId, setTrackingId] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchOrder();
@@ -44,11 +48,17 @@ const OrderDetails = () => {
     };
 
     const handleStatusUpdate = async (newStatus) => {
+        if (newStatus === 'SHIPPED' && !trackingId.trim() && order.status !== 'SHIPPED') {
+            toast.error("Tracking ID is required to mark an order as shipped");
+            return;
+        }
         if (!window.confirm(`Are you sure you want to change current status to ${newStatus}?`)) return;
 
         setUpdating(true);
         try {
-            const response = await api.post(`/orders/admin/${id}/status`, { status: newStatus });
+            const payload = { status: newStatus };
+            if (newStatus === 'SHIPPED') payload.trackingId = trackingId;
+            const response = await api.post(`/orders/admin/${id}/status`, payload);
             setOrder(response.data);
             toast.success(`Order updated to ${newStatus}`);
         } catch (error) {
@@ -56,6 +66,18 @@ const OrderDetails = () => {
             toast.error("Failed to update status");
         } finally {
             setUpdating(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!window.confirm("Are you sure you want to permanently delete this order? This action cannot be undone.")) return;
+        try {
+            await api.delete(`/orders/admin/${id}`);
+            toast.success("Order deleted successfully");
+            navigate('/orders');
+        } catch (error) {
+            console.error("Failed to delete order:", error);
+            toast.error("Failed to delete order");
         }
     };
 
@@ -108,6 +130,13 @@ const OrderDetails = () => {
                     </p>
                 </div>
                 <div className="ml-auto flex items-center gap-4">
+                    <button
+                        onClick={handleDelete}
+                        className="flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-100 text-red-600 rounded-lg hover:bg-red-100 transition-colors shadow-sm"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                    </button>
                     <button
                         onClick={handleDownloadPDF}
                         className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
@@ -185,15 +214,41 @@ const OrderDetails = () => {
                         <h2 className="font-semibold text-gray-900 mb-4">Update Status</h2>
                         <div className="space-y-2">
                             <button
-                                onClick={() => handleStatusUpdate('SHIPPED')}
-                                disabled={updating || order.status === 'SHIPPED'}
-                                className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={() => handleStatusUpdate('PAID')}
+                                disabled={updating || order.status === 'PAID'}
+                                className="w-full flex items-center justify-between px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <span className="flex items-center gap-2">
-                                    <Truck className="w-4 h-4" /> Mark as Shipped
+                                    <DollarSign className="w-4 h-4" /> Mark as Paid
                                 </span>
-                                {order.status === 'SHIPPED' && <CheckCircle className="w-4 h-4" />}
+                                {order.status === 'PAID' && <CheckCircle className="w-4 h-4" />}
                             </button>
+
+                            <div className="p-3 bg-blue-50 rounded-lg border border-blue-100 space-y-3">
+                                <button
+                                    onClick={() => handleStatusUpdate('SHIPPED')}
+                                    disabled={updating || order.status === 'SHIPPED'}
+                                    className="w-full flex items-center justify-between px-2 py-1 text-blue-700 hover:text-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <span className="flex items-center gap-2 font-medium">
+                                        <Truck className="w-4 h-4" /> Mark as Shipped
+                                    </span>
+                                    {order.status === 'SHIPPED' && <CheckCircle className="w-4 h-4" />}
+                                </button>
+                                {order.status !== 'SHIPPED' ? (
+                                    <input 
+                                        type="text" 
+                                        placeholder="Enter Tracking ID (Required)"
+                                        value={trackingId}
+                                        onChange={(e) => setTrackingId(e.target.value)}
+                                        className="w-full px-3 py-2 border border-blue-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                    />
+                                ) : (
+                                    <div className="px-2 py-1 text-sm text-blue-800">
+                                        <span className="font-semibold">Tracking ID:</span> {order.trackingId || 'N/A'}
+                                    </div>
+                                )}
+                            </div>
                             <button
                                 onClick={() => handleStatusUpdate('DELIVERED')}
                                 disabled={updating || order.status === 'DELIVERED'}
