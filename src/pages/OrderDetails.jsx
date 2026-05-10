@@ -27,6 +27,8 @@ const OrderDetails = () => {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [trackingId, setTrackingId] = useState("");
+    const [isEditingTracking, setIsEditingTracking] = useState(false);
+    const [newTrackingId, setNewTrackingId] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -78,6 +80,25 @@ const OrderDetails = () => {
         } catch (error) {
             console.error("Failed to delete order:", error);
             toast.error("Failed to delete order");
+        }
+    };
+
+    const handleSaveTracking = async () => {
+        if (!newTrackingId.trim()) {
+            toast.error("Tracking ID cannot be empty");
+            return;
+        }
+        setUpdating(true);
+        try {
+            const response = await api.post(`/orders/admin/${id}/status`, { status: 'SHIPPED', trackingId: newTrackingId });
+            setOrder(response.data);
+            setIsEditingTracking(false);
+            toast.success(`Tracking ID updated successfully`);
+        } catch (error) {
+            console.error("Failed to update tracking ID:", error);
+            toast.error("Failed to update tracking ID");
+        } finally {
+            setUpdating(false);
         }
     };
 
@@ -244,8 +265,35 @@ const OrderDetails = () => {
                                         className="w-full px-3 py-2 border border-blue-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
                                     />
                                 ) : (
-                                    <div className="px-2 py-1 text-sm text-blue-800">
-                                        <span className="font-semibold">Tracking ID:</span> {order.trackingId || 'N/A'}
+                                    <div className="px-2 py-1 text-sm text-blue-800 flex flex-col gap-2 w-full">
+                                        {isEditingTracking ? (
+                                            <div className="flex items-center gap-2 w-full">
+                                                <input 
+                                                    type="text" 
+                                                    value={newTrackingId}
+                                                    onChange={(e) => setNewTrackingId(e.target.value)}
+                                                    className="w-full px-2 py-1 border border-blue-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                                />
+                                                <button onClick={handleSaveTracking} className="text-green-600 hover:text-green-700 bg-green-100 rounded p-1" title="Save">
+                                                    <CheckCircle className="w-4 h-4" />
+                                                </button>
+                                                <button onClick={() => setIsEditingTracking(false)} className="text-red-600 hover:text-red-700 bg-red-100 rounded p-1" title="Cancel">
+                                                    <XCircle className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-between w-full">
+                                                <div>
+                                                    <span className="font-semibold">Tracking ID:</span> <span className="ml-1 select-all">{order.trackingId || 'N/A'}</span>
+                                                </div>
+                                                <button 
+                                                    onClick={() => { setIsEditingTracking(true); setNewTrackingId(order.trackingId || ""); }}
+                                                    className="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 bg-blue-100 rounded transition-colors"
+                                                >
+                                                    Edit
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
