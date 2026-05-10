@@ -9,7 +9,8 @@ import {
     MoreVertical,
     Calendar,
     DollarSign,
-    Package
+    Package,
+    Trash2
 } from "lucide-react";
 import api from "../api/axios";
 import { format } from "date-fns";
@@ -36,6 +37,18 @@ const Orders = () => {
             toast.error("Failed to load orders");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to permanently delete this order? This action cannot be undone.")) return;
+        try {
+            await api.delete(`/orders/admin/${id}`);
+            toast.success("Order deleted successfully");
+            fetchOrders();
+        } catch (error) {
+            console.error("Failed to delete order:", error);
+            toast.error("Failed to delete order");
         }
     };
 
@@ -207,12 +220,22 @@ const Orders = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <Link
-                                                to={`/orders/${order._id}`}
-                                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors"
-                                            >
-                                                <Eye className="w-4 h-4" />
-                                            </Link>
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Link
+                                                    to={`/orders/${order._id}`}
+                                                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors"
+                                                    title="View Details"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDelete(order._id)}
+                                                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                    title="Delete Order"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
