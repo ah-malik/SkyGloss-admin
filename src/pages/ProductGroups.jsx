@@ -14,6 +14,7 @@ const ProductGroups = () => {
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [isDefault, setIsDefault] = useState(false);
     const [searchProduct, setSearchProduct] = useState('');
+    const [searchGroup, setSearchGroup] = useState('');
 
     const currencies = [
         { code: 'USD', symbol: '$', name: 'US Dollar' },
@@ -223,30 +224,48 @@ const ProductGroups = () => {
         }
     };
 
+    const filteredGroups = groups.filter(g => 
+        g.name.toLowerCase().includes(searchGroup.toLowerCase()) ||
+        (g.countries && g.countries.some(c => c.toLowerCase().includes(searchGroup.toLowerCase()))) ||
+        (g.country && g.country.toLowerCase().includes(searchGroup.toLowerCase()))
+    );
+
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-end">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900">Product Groups</h1>
                     <p className="text-slate-500">Create groups with custom product pricing</p>
                 </div>
-                <button
-                    onClick={() => handleOpenModal()}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-xl font-medium shadow-lg hover:bg-blue-500 transition-all flex items-center gap-2"
-                >
-                    <Plus size={20} />
-                    New Group
-                </button>
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                        <input
+                            type="text"
+                            placeholder="Search groups or countries..."
+                            value={searchGroup}
+                            onChange={(e) => setSearchGroup(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                        />
+                    </div>
+                    <button
+                        onClick={() => handleOpenModal()}
+                        className="bg-blue-600 text-white px-6 py-2 rounded-xl font-medium shadow-lg hover:bg-blue-500 transition-all flex items-center gap-2 whitespace-nowrap"
+                    >
+                        <Plus size={20} />
+                        New Group
+                    </button>
+                </div>
             </div>
 
             <div className="grid gap-6">
                 {loading ? (
                     <div className="text-center p-10 text-slate-400">Loading grupos...</div>
-                ) : groups.length === 0 ? (
+                ) : filteredGroups.length === 0 ? (
                     <div className="text-center p-10 bg-white rounded-2xl border border-slate-200 text-slate-400">
-                        No pricing groups created yet.
+                        {searchGroup ? 'No groups matching your search.' : 'No pricing groups created yet.'}
                     </div>
-                ) : groups.map(group => (
+                ) : filteredGroups.map(group => (
                     <div key={group._id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                         <div className="p-6 flex justify-between items-center bg-slate-50/50">
                             <div>
