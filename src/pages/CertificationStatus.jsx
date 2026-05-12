@@ -53,6 +53,7 @@ const CertificationStatus = () => {
             'Partner Code': item.partnerCode,
             'Training Complete': item.isTrainingComplete ? 'Yes' : 'No',
             'Certification Status': item.status,
+            'Certificate Number': item.certificateNumber,
             'Applied Date': item.appliedDate ? new Date(item.appliedDate).toLocaleDateString() : 'N/A'
         }));
 
@@ -164,6 +165,7 @@ const CertificationStatus = () => {
                                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Shop Details</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Associated Partner</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Training</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Cert. Number</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Applied Date</th>
                             </tr>
@@ -216,7 +218,12 @@ const CertificationStatus = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-3 py-1 rounded-full text-[11px] font-black border uppercase tracking-wider ${getStatusStyle(item.status)}`}>
+                                            <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100">
+                                                {item.certificateNumber || 'N/A'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 rounded-full text-[11px] font-black border uppercase tracking-wider ${getStatusStyle(status)}`}>
                                                 {item.status}
                                             </span>
                                         </td>
