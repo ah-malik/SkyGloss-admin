@@ -223,7 +223,7 @@ const CertificationStatus = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-3 py-1 rounded-full text-[11px] font-black border uppercase tracking-wider ${getStatusStyle(status)}`}>
+                                            <span className={`px-3 py-1 rounded-full text-[11px] font-black border uppercase tracking-wider ${getStatusStyle(item.status)}`}>
                                                 {item.status}
                                             </span>
                                         </td>
