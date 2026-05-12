@@ -209,7 +209,7 @@ const Users = () => {
             password: '', // Leave blank for edit
             phoneNumber: user.phoneNumber || '',
             localPhone: (() => {
-                const phone = user.phoneNumber || '';
+                const phone = String(user.phoneNumber || '');
                 // Strip calling code prefix to get local number
                 return phone.replace(/^\+\d{1,4}\s*/, '');
             })(),
@@ -836,7 +836,7 @@ const Users = () => {
                                             {(() => {
                                                 if (!formData.country) return '+?';
                                                 const c = countries.find(c => c.name === formData.country);
-                                                return c?.phonecode ? `+${c.phonecode.replace('+', '')}` : '+?';
+                                                return c?.phonecode ? `+${String(c.phonecode).replace('+', '')}` : '+?';
                                             })()}
                                         </span>
                                         <input
@@ -847,7 +847,7 @@ const Users = () => {
                                             onChange={(e) => {
                                                 const val = e.target.value.replace(/[^0-9\s\-()]/g, '');
                                                 const c = countries.find(c => c.name === formData.country);
-                                                const code = c?.phonecode ? `+${c.phonecode.replace('+', '')}` : '';
+                                                const code = c?.phonecode ? `+${String(c.phonecode).replace('+', '')}` : '';
                                                 setFormData({ ...formData, localPhone: val, phoneNumber: code ? `${code} ${val}` : val });
                                             }}
                                         />
@@ -917,7 +917,7 @@ const Users = () => {
                                         onChange={(e) => {
                                             const countryName = e.target.value;
                                             const countryObj = countries.find(c => c.name === countryName);
-                                            const code = countryObj?.phonecode ? `+${countryObj.phonecode.replace('+', '')}` : '';
+                                            const code = countryObj?.phonecode ? `+${String(countryObj.phonecode).replace('+', '')}` : '';
                                             const localPh = formData.localPhone || '';
                                             setFormData({ ...formData, country: countryName, city: '', phoneNumber: code ? `${code} ${localPh}` : localPh });
                                             if (countryObj) {
