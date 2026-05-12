@@ -3,7 +3,6 @@ import api from '../api/axios';
 import { Country, State, City } from 'country-state-city';
 import { Search, Filter, MoreVertical, Trash2, Ban, CheckCircle, X, Loader2, Edit, Trophy, Video, Globe, Facebook, Instagram, Youtube, Linkedin, Info } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 
 const normalizeUrl = (url) => {
@@ -209,6 +208,11 @@ const Users = () => {
             role: user.role || 'master_partner',
             password: '', // Leave blank for edit
             phoneNumber: user.phoneNumber || '',
+            localPhone: (() => {
+                const phone = user.phoneNumber || '';
+                // Strip calling code prefix to get local number
+                return phone.replace(/^\+\d{1,4}\s*/, '');
+            })(),
             companyName: user.companyName || '',
             country: user.country || '',
             productGroup: user.productGroup?._id || user.productGroup || '',
@@ -263,6 +267,7 @@ const Users = () => {
             role: 'certified_shop',
             password: '',
             phoneNumber: '',
+            localPhone: '',
             companyName: '',
             country: '',
             productGroup: '',
@@ -826,17 +831,25 @@ const Users = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-semibold text-slate-700">Phone Number</label>
-                                    <div className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus-within:ring-2 focus-within:ring-blue-500/20">
-                                        <PhoneInput
-                                            placeholder="+1 (234) 567-890"
-                                            value={formData.phoneNumber}
-                                            onChange={(val) => setFormData({ ...formData, phoneNumber: val || '' })}
-                                            defaultCountry={(() => {
-                                                if (!formData.country) return undefined;
-                                                const c = Country.getAllCountries().find(c => c.name === formData.country);
-                                                return c?.isoCode || undefined;
+                                    <div className="w-full flex items-center bg-slate-50 border border-slate-200 rounded-xl focus-within:ring-2 focus-within:ring-blue-500/20 overflow-hidden">
+                                        <span className="px-3 py-2.5 bg-slate-100 border-r border-slate-200 text-sm font-semibold text-slate-600 select-none whitespace-nowrap">
+                                            {(() => {
+                                                if (!formData.country) return '+?';
+                                                const c = countries.find(c => c.name === formData.country);
+                                                return c?.phonecode ? `+${c.phonecode.replace('+', '')}` : '+?';
                                             })()}
-                                            key={formData.country || 'no-country'}
+                                        </span>
+                                        <input
+                                            type="tel"
+                                            placeholder="Phone number"
+                                            className="flex-1 px-3 py-2.5 bg-transparent outline-none text-sm"
+                                            value={formData.localPhone || ''}
+                                            onChange={(e) => {
+                                                const val = e.target.value.replace(/[^0-9\s\-()]/g, '');
+                                                const c = countries.find(c => c.name === formData.country);
+                                                const code = c?.phonecode ? `+${c.phonecode.replace('+', '')}` : '';
+                                                setFormData({ ...formData, localPhone: val, phoneNumber: code ? `${code} ${val}` : val });
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -904,7 +917,9 @@ const Users = () => {
                                         onChange={(e) => {
                                             const countryName = e.target.value;
                                             const countryObj = countries.find(c => c.name === countryName);
-                                            setFormData({ ...formData, country: countryName, city: '' });
+                                            const code = countryObj?.phonecode ? `+${countryObj.phonecode.replace('+', '')}` : '';
+                                            const localPh = formData.localPhone || '';
+                                            setFormData({ ...formData, country: countryName, city: '', phoneNumber: code ? `${code} ${localPh}` : localPh });
                                             if (countryObj) {
                                                 const rawCities = City.getCitiesOfCountry(countryObj.isoCode) || [];
                                                 const rawStates = State.getStatesOfCountry(countryObj.isoCode) || [];
