@@ -831,6 +831,12 @@ const Users = () => {
                                             placeholder="+1 (234) 567-890"
                                             value={formData.phoneNumber}
                                             onChange={(val) => setFormData({ ...formData, phoneNumber: val || '' })}
+                                            defaultCountry={(() => {
+                                                if (!formData.country) return undefined;
+                                                const c = Country.getAllCountries().find(c => c.name === formData.country);
+                                                return c?.isoCode || undefined;
+                                            })()}
+                                            key={formData.country || 'no-country'}
                                         />
                                     </div>
                                 </div>
