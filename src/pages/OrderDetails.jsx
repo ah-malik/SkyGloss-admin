@@ -257,8 +257,8 @@ const OrderDetails = () => {
                                     {order.status === 'SHIPPED' && <CheckCircle className="w-4 h-4" />}
                                 </button>
                                 {order.status !== 'SHIPPED' ? (
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         placeholder="Enter Tracking ID (Required)"
                                         value={trackingId}
                                         onChange={(e) => setTrackingId(e.target.value)}
@@ -268,8 +268,8 @@ const OrderDetails = () => {
                                     <div className="px-2 py-1 text-sm text-blue-800 flex flex-col gap-2 w-full">
                                         {isEditingTracking ? (
                                             <div className="flex items-center gap-2 w-full">
-                                                <input 
-                                                    type="text" 
+                                                <input
+                                                    type="text"
                                                     value={newTrackingId}
                                                     onChange={(e) => setNewTrackingId(e.target.value)}
                                                     className="w-full px-2 py-1 border border-blue-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
@@ -286,7 +286,7 @@ const OrderDetails = () => {
                                                 <div>
                                                     <span className="font-semibold">Tracking ID:</span> <span className="ml-1 select-all">{order.trackingId || 'N/A'}</span>
                                                 </div>
-                                                <button 
+                                                <button
                                                     onClick={() => { setIsEditingTracking(true); setNewTrackingId(order.trackingId || ""); }}
                                                     className="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 bg-blue-100 rounded transition-colors"
                                                 >
@@ -297,7 +297,7 @@ const OrderDetails = () => {
                                     </div>
                                 )}
                             </div>
-                            <button
+                            {/* <button
                                 onClick={() => handleStatusUpdate('DELIVERED')}
                                 disabled={updating || order.status === 'DELIVERED'}
                                 className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -306,7 +306,7 @@ const OrderDetails = () => {
                                     <Box className="w-4 h-4" /> Mark as Complete
                                 </span>
                                 {order.status === 'DELIVERED' && <CheckCircle className="w-4 h-4" />}
-                            </button>
+                            </button> */}
                             <button
                                 onClick={() => handleStatusUpdate('CANCELLED')}
                                 disabled={updating || order.status === 'CANCELLED'}

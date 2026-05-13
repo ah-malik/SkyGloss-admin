@@ -23,6 +23,7 @@ import LiveChat from './pages/LiveChat';
 import ProductGroups from './pages/ProductGroups';
 import Notifications from './pages/Notifications';
 import RegistrationFees from './pages/RegistrationFees';
+import WistiaPlayer from './pages/testing';
 
 // Simple component to handle the legacy chat redirect
 const ChatRedirect = () => {
@@ -37,6 +38,7 @@ function App() {
         <NotificationProvider>
           <Toaster position="top-right" />
           <Routes>
+            <Route path="/testing" element={<WistiaPlayer />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -54,13 +56,13 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
               <Route element={<Layout children={<ShopRequests />} />} path="/shop-requests" />
               <Route element={<Layout children={<Products />} />} path="/products" />
-               <Route element={<Layout children={<CertificationRequests />} />} path="/certification-requests" />
+              <Route element={<Layout children={<CertificationRequests />} />} path="/certification-requests" />
               <Route element={<Layout children={<CertificationStatus />} />} path="/certification-status" />
               <Route element={<Layout children={<Orders />} />} path="/orders" />
               <Route element={<Layout children={<OrderDetails />} />} path="/orders/:id" />
               <Route element={<Layout children={<SupportTickets />} />} path="/support-tickets" />
               <Route element={<Layout children={<LiveChat />} />} path="/live-chat" />
-               <Route element={<Layout children={<ProductGroups />} />} path="/product-groups" />
+              <Route element={<Layout children={<ProductGroups />} />} path="/product-groups" />
               <Route element={<Layout children={<RegistrationFees />} />} path="/registration-fees" />
               <Route element={<Layout children={<Notifications />} />} path="/notifications" />
             </Route>
