@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import api from '../api/axios';
 import { Country, State, City } from 'country-state-city';
-import { Search, Filter, MoreVertical, Trash2, Ban, CheckCircle, X, Loader2, Edit, Trophy, Video, Globe, Facebook, Instagram, Youtube, Linkedin, Info } from 'lucide-react';
+import { Search, Filter, MoreVertical, Trash2, Ban, CheckCircle, X, Loader2, Edit, Trophy, Video, Globe, Facebook, Instagram, Youtube, Linkedin, Info, MapPin } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
@@ -161,6 +161,17 @@ const Users = () => {
             fetchUsers();
         } catch (err) {
             toast.error('Failed to update certification status');
+        }
+    };
+
+    const handleMapVisibilityToggle = async (user) => {
+        try {
+            const newVisibilityStatus = !user.isVisibleOnMap;
+            await api.patch(`/users/${user._id}`, { isVisibleOnMap: newVisibilityStatus });
+            toast.success(`Shop map visibility ${newVisibilityStatus ? 'Enabled' : 'Disabled'}`);
+            fetchUsers();
+        } catch (err) {
+            toast.error('Failed to update map visibility');
         }
     };
 
@@ -678,13 +689,30 @@ const Users = () => {
                                         <div className="flex justify-end gap-2">
                                             {/* Full administrative control enabled for all roles */}
                                             {user.role === 'certified_shop' && (
-                                                <button
-                                                    onClick={() => handleCertificationToggle(user)}
-                                                    className={`p-2 rounded-lg transition-colors ${user.isCertified ? 'text-amber-500 hover:bg-amber-50' : 'text-slate-400 hover:bg-slate-50'}`}
-                                                    title={user.isCertified ? "Remove Certification" : "Approve Certification"}
-                                                >
-                                                    <Trophy size={18} fill={user.isCertified ? "currentColor" : "none"} />
-                                                </button>
+                                                <>
+                                                    <div className="flex flex-col items-center justify-center min-w-[50px] mr-2">
+                                                        <label className={`relative inline-flex items-center ${(!user.isCertified || user.status === 'blocked') ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`} title={user.status === 'blocked' ? "Blocked" : !user.isCertified ? "Not Certified" : "Toggle Map Visibility"}>
+                                                            <input
+                                                                type="checkbox"
+                                                                className="sr-only peer"
+                                                                checked={Boolean(user.isVisibleOnMap)}
+                                                                onChange={() => handleMapVisibilityToggle(user)}
+                                                                disabled={!user.isCertified || user.status === 'blocked'}
+                                                            />
+                                                            <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0EA0DC]"></div>
+                                                        </label>
+                                                        <span className="text-[9px] mt-1 font-medium text-slate-500">
+                                                            {user.status === 'blocked' ? "Blocked" : !user.isCertified ? "Not Cert." : user.isVisibleOnMap ? "Visible" : "Hidden"}
+                                                        </span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleCertificationToggle(user)}
+                                                        className={`p-2 rounded-lg transition-colors ${user.isCertified ? 'text-amber-500 hover:bg-amber-50' : 'text-slate-400 hover:bg-slate-50'}`}
+                                                        title={user.isCertified ? "Remove Certification" : "Approve Certification"}
+                                                    >
+                                                        <Trophy size={18} fill={user.isCertified ? "currentColor" : "none"} />
+                                                    </button>
+                                                </>
                                             )}
                                             {user.status === 'active' ? (
                                                 <button
