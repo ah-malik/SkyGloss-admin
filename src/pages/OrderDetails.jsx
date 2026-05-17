@@ -386,6 +386,9 @@ const OrderDetails = () => {
                                 {order.shippingAddress?.address}<br />
                                 {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}<br />
                                 {order.shippingAddress?.country}
+                                {order.shippingAddress?.taxId && (
+                                    <><br /><span className="text-gray-500 mt-1 inline-block">Tax ID: <strong className="text-gray-900">{order.shippingAddress.taxId}</strong></span></>
+                                )}
                             </p>
                         </div>
                     </div>
