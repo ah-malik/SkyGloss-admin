@@ -71,15 +71,19 @@ const OrderDetails = () => {
         }
     };
 
-    const handleDelete = async () => {
-        if (!window.confirm("Are you sure you want to permanently delete this order? This action cannot be undone.")) return;
+    const handleDelete = async (isCancel = false) => {
+        const confirmMsg = isCancel 
+            ? "Are you sure you want to cancel and delete this order? This action cannot be undone."
+            : "Are you sure you want to permanently delete this order? This action cannot be undone.";
+
+        if (!window.confirm(confirmMsg)) return;
         try {
             await api.delete(`/orders/admin/${id}`);
-            toast.success("Order deleted successfully");
+            toast.success(isCancel ? "Order cancelled and deleted successfully" : "Order deleted successfully");
             navigate('/orders');
         } catch (error) {
-            console.error("Failed to delete order:", error);
-            toast.error("Failed to delete order");
+            console.error(isCancel ? "Failed to cancel order:" : "Failed to delete order:", error);
+            toast.error(isCancel ? "Failed to cancel order" : "Failed to delete order");
         }
     };
 
@@ -308,14 +312,12 @@ const OrderDetails = () => {
                                 {order.status === 'DELIVERED' && <CheckCircle className="w-4 h-4" />}
                             </button> */}
                             <button
-                                onClick={() => handleStatusUpdate('CANCELLED')}
-                                disabled={updating || order.status === 'CANCELLED'}
-                                className="w-full flex items-center justify-between px-4 py-3 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={() => handleDelete(true)}
+                                className="w-full flex items-center justify-between px-4 py-3 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors"
                             >
                                 <span className="flex items-center gap-2">
                                     <XCircle className="w-4 h-4" /> Cancel Order
                                 </span>
-                                {order.status === 'CANCELLED' && <CheckCircle className="w-4 h-4" />}
                             </button>
                         </div>
                     </div>
